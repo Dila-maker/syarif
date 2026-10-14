@@ -77,7 +77,7 @@
 
     main { max-width: 1200px; width: 100%; margin: 20px auto; padding: 0 16px; flex: 1; }
 
-    .auth-container { max-width: 420px; margin: 40px auto; background: white; border-radius: var(--card-radius); box-shadow: var(--shadow-md); overflow: hidden; border: 1px solid var(--border-color); }
+    .auth-container { max-width: 440px; margin: 40px auto; background: white; border-radius: var(--card-radius); box-shadow: var(--shadow-md); overflow: hidden; border: 1px solid var(--border-color); }
     .auth-tabs { display: flex; border-bottom: 1px solid var(--border-color); background: #F1F5F9; }
     .auth-tab-btn { flex: 1; padding: 14px; border: none; background: none; font-weight: 600; color: var(--text-muted); cursor: pointer; font-size: 14px; transition: all 0.2s; }
     .auth-tab-btn.active { background: white; color: var(--primary-blue); border-bottom: 2px solid var(--primary-blue); }
@@ -200,8 +200,8 @@
       <!-- Form Login Guru -->
       <form id="form-guru-login" class="auth-form" onsubmit="window.handleGuruLogin(event)">
         <div class="form-group">
-          <label for="guru-nip"><i class="fa-solid fa-id-card"></i> NIP / NIK Guru</label>
-          <input type="text" id="guru-nip" class="form-control" placeholder="Masukkan 18 digit NIP" maxlength="18" required>
+          <label for="guru-nip"><i class="fa-solid fa-id-card"></i> NIP / NIPGTT Guru</label>
+          <input type="text" id="guru-nip" class="form-control" placeholder="Masukkan NIP / NIPGTT Guru" maxlength="18" required>
         </div>
         <div class="form-group">
           <label for="guru-pass"><i class="fa-solid fa-lock"></i> Kata Sandi</label>
@@ -215,8 +215,11 @@
         <button type="submit" class="btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Masuk Guru</button>
 
         <div id="guru-demo-info" class="demo-info-box">
-          <strong><i class="fa-solid fa-circle-info"></i> Akun Guru Demo:</strong><br>
-          NIP: <code>197801122005011001</code> | Sandi: <code>123456</code>
+          <strong><i class="fa-solid fa-circle-info"></i> Contoh NIP / NIPGTT Guru:</strong><br>
+          • <code>196907271995031003</code> (Syafruddin, S.Pd., M.Si.)<br>
+          • <code>197106252010012004</code> (Nurjannah, S.Pd.)<br>
+          • <code>198905110001</code> (Nawir, S.Pd., Gr.)<br>
+          <small>Sandi Bawaan Semua Guru: <code>123456</code></small>
         </div>
       </form>
 
@@ -356,7 +359,7 @@
           <img id="prof-img-avatar" class="img-avatar-sm" style="width: 72px; height: 72px;" src="" alt="Foto Profile">
           <div style="display: flex; flex-direction: column; gap: 4px;">
             <div><strong id="prof-nama" style="font-size: 16px;">-</strong></div>
-            <div style="font-size: 13px; color: var(--text-muted);">NIP: <span id="prof-nip">-</span></div>
+            <div style="font-size: 13px; color: var(--text-muted);">NIP / NIPGTT: <span id="prof-nip">-</span></div>
             <div style="font-size: 13px; color: var(--text-muted);">Mapel: <span id="prof-mapel">-</span></div>
             <div style="font-size: 12px; margin-top: 4px;">
               Status Biometrik Wajah: <span id="prof-face-status" class="badge badge-warning">Belum Terdaftar</span>
@@ -449,7 +452,7 @@
               <tr>
                 <th>No</th>
                 <th>Nama Guru</th>
-                <th>NIP</th>
+                <th>NIP / NIPGTT</th>
                 <th>Masuk</th>
                 <th>Pulang</th>
                 <th>Selfie</th>
@@ -536,7 +539,7 @@
               <tr>
                 <th>No</th>
                 <th>Nama Guru</th>
-                <th>NIP</th>
+                <th>NIP / NIPGTT</th>
                 <th>Hadir</th>
                 <th>Terlambat</th>
                 <th>Izin</th>
@@ -565,7 +568,7 @@
               <tr>
                 <th>No</th>
                 <th>Foto</th>
-                <th>NIP / NIK</th>
+                <th>NIP / NIPGTT</th>
                 <th>Nama Guru</th>
                 <th>Mata Pelajaran</th>
                 <th>Sandi</th>
@@ -748,7 +751,7 @@
   <footer>
     <div class="footer-kepsek">
       Kepala Sekolah: <span id="footer-kepsek-nama">Syafruddin, S.Pd., M.Si.</span><br>
-      NIP. <span id="footer-kepsek-nip">19690727 199503 1 003</span>
+      NIP. <span id="footer-kepsek-nip">196907271995031003</span>
     </div>
     <div>&copy; 2025 SMPN 4 Tinggimoncong — Data disimpan lokal di perangkat Anda.</div>
   </footer>
@@ -778,25 +781,25 @@
       jamTerlambat: "07:15",
       jamPulang: "13:30",
       kepsekNama: "Syafruddin, S.Pd., M.Si.",
-      kepsekNip: "19690727 199503 1 003",
+      kepsekNip: "196907271995031003",
       adminUsername: "admin",
       adminSalt: "smpn4salt2025",
-      adminPassHash: null, // Dinamis diinisialisasi saat pertama run
+      adminPassHash: null,
       modeVerifikasi: "selfie",
       faceThreshold: 0.55
     };
 
+    // Daftar Resmi Guru SMPN 4 Tinggimoncong
     const INITIAL_GURU_LIST = [
-      { nip: "197801122005011001", nama: "Ahmad Subardjo, S.Pd.", mapel: "Matematika", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "198203152008022003", nama: "Siti Aminah, S.Pd.", mapel: "Bahasa Indonesia", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "198505202010011005", nama: "Bambang Pamungkas, M.Pd.", mapel: "PJOK", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "198911042014032002", nama: "Dewi Sartika, S.Si.", mapel: "IPA", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "199102182019021004", nama: "Eko Prasetyo, S.Hum.", mapel: "Bahasa Inggris", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "198407122009032001", nama: "Fitriani, S.Pd.", mapel: "IPS", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "199304252020122008", nama: "Gusti Ayu, S.Kom.", mapel: "Informatika", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "198709302011011002", nama: "Hasanuddin, S.Ag.", mapel: "Pendidikan Agama", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "199006142015042006", nama: "Indah Permata, S.Pd.", mapel: "PPKn", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "199408012022031003", nama: "Joko Widodo, S.Sn.", mapel: "Seni Budaya", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null }
+      { nip: "196907271995031003", nama: "Syafruddin, S.Pd., M.Si.", mapel: "Kepala Sekolah / IPA", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "197106252010012004", nama: "Nurjannah, S.Pd.", mapel: "Bahasa Indonesia", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "198905110001", nama: "Nawir, S.Pd., Gr.", mapel: "Matematika", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200011120002", nama: "St. Ulil Asmi, S.Pd., Gr.", mapel: "Bahasa Inggris", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "198710020003", nama: "Satriani, S.Pd., Gr.", mapel: "IPA", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "199906070004", nama: "Nurmiati, S.Pd., Gr.", mapel: "IPS", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200002080005", nama: "Ibnu Nandar Almudatsir, S.Pd.", mapel: "PJOK", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200007110006", nama: "Nur Indah Sari, S.Pd.", mapel: "Informatika", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200901010007", nama: "Satriani, A.Ma.", mapel: "Seni Budaya & Mulok", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null }
     ];
 
     /* ==========================================================================
@@ -1067,11 +1070,10 @@
         showToast(`Selamat datang, ${targetGuru.nama}!`, "success");
         renderLoggedInUI();
       } else {
-        showToast("NIP atau Kata Sandi salah!", "error");
+        showToast("NIP / NIPGTT atau Kata Sandi salah!", "error");
       }
     };
 
-    /* LOGIKA LOGIN ADMIN DENGAN PERBAIKAN AKURASI HASH */
     window.handleAdminLogin = async function(e) {
       e.preventDefault();
       const user = document.getElementById('admin-user').value.trim();
@@ -2025,12 +2027,12 @@
       const htmlForm = `
         <form id="form-crud-guru" style="display:flex; flex-direction:column; gap:12px;">
           <div class="form-group">
-            <label>NIP / NIK Guru (18 Digit Angka)</label>
-            <input type="text" id="crud-nip" class="form-control" maxlength="18" placeholder="Contoh: 198001012005011001" required>
+            <label>NIP / NIPGTT Guru</label>
+            <input type="text" id="crud-nip" class="form-control" maxlength="18" placeholder="Contoh: 196907271995031003 atau 198905110001" required>
           </div>
           <div class="form-group">
             <label>Nama Lengkap (dengan Gelar)</label>
-            <input type="text" id="crud-nama" class="form-control" placeholder="Contoh: Drs. Ahmad Dahlan, M.Pd." required>
+            <input type="text" id="crud-nama" class="form-control" placeholder="Contoh: Syafruddin, S.Pd., M.Si." required>
           </div>
           <div class="form-group">
             <label>Mata Pelajaran Utama</label>
@@ -2049,14 +2051,14 @@
         const mapel = document.getElementById('crud-mapel').value.trim();
         const fotoInput = document.getElementById('crud-foto');
 
-        if (rawNip.length !== 18) {
-          showToast("NIP harus persis 18 digit angka!", "error");
+        if (rawNip.length < 8 || rawNip.length > 18) {
+          showToast("NIP / NIPGTT harus terdiri dari 8 hingga 18 digit angka!", "error");
           return;
         }
 
         const guruList = safeStorageGet(GURU_LIST_KEY) || [];
         if (guruList.some(g => g.nip === rawNip)) {
-          showToast("NIP tersebut sudah terdaftar!", "error");
+          showToast("NIP / NIPGTT tersebut sudah terdaftar!", "error");
           return;
         }
 
@@ -2092,7 +2094,7 @@
       const htmlForm = `
         <form style="display:flex; flex-direction:column; gap:12px;">
           <div class="form-group">
-            <label>NIP / NIK (Tidak dapat diubah)</label>
+            <label>NIP / NIPGTT (Tidak dapat diubah)</label>
             <input type="text" class="form-control" value="${guru.nip}" disabled>
           </div>
           <div class="form-group">
@@ -2414,7 +2416,7 @@
 
       doc.autoTable({
         startY: 46,
-        head: [['No', 'Nama Guru', 'NIP', 'Hadir', 'Terlambat', 'Izin', 'Sakit', 'Cuti', 'Alpa', '% Kehadiran']],
+        head: [['No', 'Nama Guru', 'NIP / NIPGTT', 'Hadir', 'Terlambat', 'Izin', 'Sakit', 'Cuti', 'Alpa', '% Kehadiran']],
         body: tableRows,
         theme: 'grid',
         headStyles: { fillColor: [30, 58, 138], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
@@ -2472,7 +2474,7 @@
       const records = safeStorageGet(ABSENSI_KEY) || [];
 
       let csvContent = "\uFEFF";
-      csvContent += "No,Nama Guru,NIP,Hadir,Terlambat,Izin,Sakit,Cuti,Alpa,% Kehadiran\n";
+      csvContent += "No,Nama Guru,NIP / NIPGTT,Hadir,Terlambat,Izin,Sakit,Cuti,Alpa,% Kehadiran\n";
 
       guruList.forEach((guru, idx) => {
         let hadir = 0, terlambat = 0, izin = 0, sakit = 0, cuti = 0, alpa = 0;
@@ -2649,7 +2651,7 @@
     };
 
     window.resetSampleDataModal = function() {
-      window.openModal("Muat Ulang Data Contoh", "Aksi ini akan mereset daftar guru dan konfigurasi ke data contoh bawaan awal.", async () => {
+      window.openModal("Muat Ulang Data Resmi Guru", "Aksi ini akan mereset daftar guru ke data resmi SMPN 4 Tinggimoncong dan mengembalikan konfigurasi awal.", async () => {
         const defaultHash = await hashText("123456");
         const freshGuru = INITIAL_GURU_LIST.map(g => ({ ...g, passHash: defaultHash }));
         
@@ -2658,8 +2660,8 @@
 
         safeStorageSet(GURU_LIST_KEY, freshGuru);
         safeStorageSet(APP_CONFIG_KEY, freshConfig);
-        addActivityLog("Reset Data", "Mereset daftar guru dan sistem ke data contoh");
-        showToast("Data contoh berhasil dimuat ulang!", "success");
+        addActivityLog("Reset Data", "Mereset daftar guru ke data resmi SMPN 4 Tinggimoncong");
+        showToast("Data resmi guru berhasil dimuat ulang!", "success");
         setTimeout(() => window.location.reload(), 1200);
       });
     };
