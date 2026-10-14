@@ -1,0 +1,2691 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Absensi Guru SMPN 4 Tinggimoncong - Fase 4 (Lengkap)</title>
+  
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6.5.1 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Leaflet CSS & JS 1.9.4 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Chart.js 4.4.1 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- jsPDF 2.5.1 & AutoTable 3.8.2 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- SheetJS XLSX 0.18.5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <!-- [FASE 4] Face API 1.7.12 (Loaded with fallback support) -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.js"></script>
+
+  <style>
+    :root {
+      --primary-blue: #1E3A8A;
+      --accent-emerald: #10B981;
+      --bg-slate: #F8FAFC;
+      --text-dark: #1E293B;
+      --text-muted: #64748B;
+      --border-color: #E2E8F0;
+      --danger-red: #EF4444;
+      --warning-amber: #F59E0B;
+      --card-radius: 12px;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    body { background-color: var(--bg-slate); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
+
+    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; max-width: 320px; width: 100%; }
+    .toast { padding: 12px 16px; border-radius: 8px; color: #fff; font-size: 14px; font-weight: 500; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease-out; }
+    .toast-success { background-color: var(--accent-emerald); }
+    .toast-error { background-color: var(--danger-red); }
+    .toast-warning { background-color: var(--warning-amber); color: #1E293B; }
+    .toast-info { background-color: #3B82F6; }
+
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    .demo-banner { background-color: #FEF3C7; color: #92400E; font-size: 13px; text-align: center; padding: 6px 12px; border-bottom: 1px solid #FDE68A; font-weight: 500; }
+
+    header { background: linear-gradient(135deg, var(--primary-blue) 0%, #1D4ED8 60%, var(--accent-emerald) 100%); color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); }
+    .header-brand { display: flex; align-items: center; gap: 14px; }
+    .header-logo { width: 48px; height: 48px; border-radius: 50%; background-color: white; padding: 4px; box-shadow: var(--shadow-sm); object-fit: contain; }
+    .header-titles h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; line-height: 1.2; }
+    .header-titles p { font-size: 12px; opacity: 0.9; font-weight: 300; }
+
+    .user-info-bar { display: flex; align-items: center; gap: 12px; }
+    .user-badge { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(4px); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+    .btn-logout { background-color: rgba(239, 68, 68, 0.85); color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
+    .btn-logout:hover { background-color: var(--danger-red); }
+
+    nav { background-color: white; border-bottom: 1px solid var(--border-color); padding: 0 24px; display: flex; gap: 8px; overflow-x: auto; }
+    .nav-btn { padding: 12px 18px; border: none; background: none; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+    .nav-btn.active { color: var(--primary-blue); border-bottom-color: var(--primary-blue); font-weight: 600; }
+
+    main { max-width: 1200px; width: 100%; margin: 20px auto; padding: 0 16px; flex: 1; }
+
+    .auth-container { max-width: 420px; margin: 40px auto; background: white; border-radius: var(--card-radius); box-shadow: var(--shadow-md); overflow: hidden; border: 1px solid var(--border-color); }
+    .auth-tabs { display: flex; border-bottom: 1px solid var(--border-color); background: #F1F5F9; }
+    .auth-tab-btn { flex: 1; padding: 14px; border: none; background: none; font-weight: 600; color: var(--text-muted); cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .auth-tab-btn.active { background: white; color: var(--primary-blue); border-bottom: 2px solid var(--primary-blue); }
+    .auth-form { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+    .form-control { padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; outline: none; transition: border 0.2s; }
+    .form-control:focus { border-color: var(--primary-blue); }
+
+    .btn-primary { background-color: var(--primary-blue); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-primary:hover { background-color: #1D4ED8; }
+    .btn-emerald { background-color: var(--accent-emerald); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-emerald:hover { background-color: #059669; }
+    .btn-danger { background-color: var(--danger-red); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; }
+    .btn-secondary { background: #E2E8F0; color: var(--text-dark); border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+
+    .demo-info-box { background-color: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 12px; font-size: 12px; color: #1E40AF; line-height: 1.5; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .card { background: white; border-radius: var(--card-radius); padding: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); margin-bottom: 20px; }
+    .card-title { font-size: 16px; font-weight: 700; color: var(--primary-blue); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+
+    .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; }
+    .badge-success { background: #D1FAE5; color: #065F46; }
+    .badge-warning { background: #FEF3C7; color: #92400E; }
+    .badge-danger { background: #FEE2E2; color: #991B1B; }
+    .badge-info { background: #E0F2FE; color: #075985; }
+
+    .table-responsive { overflow-x: auto; width: 100%; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); }
+    th { background-color: #F8FAFC; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+    tr:hover { background-color: #F1F5F9; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .stat-card { background: white; padding: 16px; border-radius: var(--card-radius); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 14px; }
+    .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .stat-val { font-size: 22px; font-weight: 700; color: var(--text-dark); }
+    .stat-label { font-size: 12px; color: var(--text-muted); }
+
+    .gps-info { background-color: #F1F5F9; border-radius: 8px; padding: 14px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+    .gps-row { display: flex; justify-content: space-between; align-items: center; }
+
+    .map-container { width: 100%; height: 280px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 16px; z-index: 1; }
+    .sim-box { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 12px; }
+
+    /* [FASE 4] Camera Container & Live Feed Styling */
+    .camera-wrapper { position: relative; width: 100%; max-width: 360px; margin: 0 auto 16px auto; aspect-ratio: 4/3; background: #0F172A; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 2px solid var(--primary-blue); }
+    .camera-wrapper video, .camera-wrapper canvas { width: 100%; height: 100%; object-fit: cover; }
+    .camera-overlay { position: absolute; border: 2px dashed rgba(255, 255, 255, 0.7); border-radius: 50%; width: 200px; height: 200px; pointer-events: none; }
+    .camera-status-text { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 11px; color: white; background: rgba(0,0,0,0.6); padding: 4px; }
+
+    .modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(2px); z-index: 9000; display: none; align-items: center; justify-content: center; padding: 16px; }
+    .modal-backdrop.active { display: flex; }
+    .modal-content { background: white; border-radius: var(--card-radius); max-width: 540px; width: 100%; box-shadow: var(--shadow-md); overflow: hidden; animation: modalUp 0.25s ease-out; }
+    @keyframes modalUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header { padding: 16px 20px; background: #F8FAFC; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h3 { font-size: 16px; font-weight: 700; color: var(--primary-blue); }
+    .modal-close { background: none; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer; }
+    .modal-body { padding: 20px; font-size: 14px; line-height: 1.5; max-height: 75vh; overflow-y: auto; }
+    .modal-footer { padding: 12px 20px; background: #F8FAFC; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 10px; }
+
+    footer { background-color: white; border-top: 1px solid var(--border-color); padding: 16px 24px; text-align: center; font-size: 12px; color: var(--text-muted); margin-top: auto; }
+    .footer-kepsek { font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
+
+    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
+    .chart-box { background: white; border-radius: var(--card-radius); padding: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); height: 320px; position: relative; }
+
+    .img-avatar-sm { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color); }
+
+    .d-none { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Demo / Non-HTTPS Banner -->
+  <div id="demo-banner" class="demo-banner d-none">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    Aplikasi Demo — Data tersimpan secara lokal di browser perangkat Anda. Kamera membutuhkan koneksi HTTPS atau Localhost.
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-brand">
+      <img id="header-logo-img" class="header-logo" alt="Logo Sekolah" src="" />
+      <div class="header-titles">
+        <h1 id="app-school-name">SMPN 4 TINGGIMONCONG</h1>
+        <p id="app-agency-name">Dinas Pendidikan Kabupaten Gowa</p>
+      </div>
+    </div>
+    <div id="user-info-section" class="user-info-bar d-none">
+      <span id="user-display-badge" class="user-badge"><i class="fa-solid fa-user"></i> <span id="user-display-name">User</span></span>
+      <button class="btn-logout" onclick="window.appLogout()"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav id="main-nav" class="d-none">
+    <!-- Tabs injected dynamically based on user role -->
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+    <!-- View: Login -->
+    <div id="view-login" class="auth-container">
+      <div class="auth-tabs">
+        <button id="tab-login-guru" class="auth-tab-btn active" onclick="window.switchLoginTab('guru')"><i class="fa-solid fa-user-graduate"></i> Login Guru</button>
+        <button id="tab-login-admin" class="auth-tab-btn" onclick="window.switchLoginTab('admin')"><i class="fa-solid fa-user-shield"></i> Login Admin</button>
+      </div>
+
+      <!-- Form Login Guru -->
+      <form id="form-guru-login" class="auth-form" onsubmit="window.handleGuruLogin(event)">
+        <div class="form-group">
+          <label for="guru-nip"><i class="fa-solid fa-id-card"></i> NIP / NIK Guru</label>
+          <input type="text" id="guru-nip" class="form-control" placeholder="Masukkan 18 digit NIP" maxlength="18" required>
+        </div>
+        <div class="form-group">
+          <label for="guru-pass"><i class="fa-solid fa-lock"></i> Kata Sandi</label>
+          <input type="password" id="guru-pass" class="form-control" placeholder="Masukkan kata sandi" required>
+        </div>
+        <button type="submit" class="btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Masuk Guru</button>
+
+        <div id="guru-demo-info" class="demo-info-box">
+          <strong><i class="fa-solid fa-circle-info"></i> Akun Guru Demo:</strong><br>
+          NIP: <code>197801122005011001</code> | Sandi: <code>123456</code>
+        </div>
+      </form>
+
+      <!-- Form Login Admin -->
+      <form id="form-admin-login" class="auth-form d-none" onsubmit="window.handleAdminLogin(event)">
+        <div class="form-group">
+          <label for="admin-user"><i class="fa-solid fa-user"></i> Username Admin</label>
+          <input type="text" id="admin-user" class="form-control" placeholder="Username admin" required>
+        </div>
+        <div class="form-group">
+          <label for="admin-pass"><i class="fa-solid fa-lock"></i> Kata Sandi</label>
+          <input type="password" id="admin-pass" class="form-control" placeholder="Kata sandi admin" required>
+        </div>
+        <button type="submit" class="btn-emerald"><i class="fa-solid fa-shield-halved"></i> Masuk Admin</button>
+
+        <div class="demo-info-box">
+          <strong><i class="fa-solid fa-circle-info"></i> Akun Admin Demo:</strong><br>
+          Username: <code>admin</code> | Sandi: <code>admin123</code>
+        </div>
+      </form>
+    </div>
+
+    <!-- View Guru: Absensi -->
+    <div id="view-guru-absensi" class="d-none">
+      <div class="grid-2">
+        <!-- Form Presensi GPS & Peta -->
+        <div class="card">
+          <div class="card-title">
+            <span><i class="fa-solid fa-location-crosshairs"></i> Presensi GPS Real-time</span>
+            <button class="btn-secondary btn-sm" onclick="window.toggleSimulasiGPS()"><i class="fa-solid fa-vial"></i> Mode Simulasi</button>
+          </div>
+
+          <div id="simulasi-gps-box" class="sim-box d-none">
+            <strong><i class="fa-solid fa-flask"></i> Mode Simulasi GPS Aktif:</strong>
+            <p style="margin: 4px 0 8px 0; color: #92400E;">Geser marker di peta atau masukkan koordinat untuk menguji radius sekolah.</p>
+            <div style="display: flex; gap: 8px;">
+              <input type="number" step="any" id="sim-lat" class="form-control" style="font-size: 11px; padding: 4px 8px;" placeholder="Lat">
+              <input type="number" step="any" id="sim-lng" class="form-control" style="font-size: 11px; padding: 4px 8px;" placeholder="Lng">
+              <button class="btn-primary btn-sm" onclick="window.applySimulasiGPS()"><i class="fa-solid fa-check"></i> Terapkan</button>
+            </div>
+          </div>
+
+          <div id="guru-map" class="map-container"></div>
+          
+          <div class="gps-info">
+            <div class="gps-row">
+              <span>Status GPS:</span>
+              <span id="gps-status" class="badge badge-warning">Mencari Sinyal GPS...</span>
+            </div>
+            <div class="gps-row">
+              <span>Lokasi Geocoded:</span>
+              <span id="gps-address" style="font-size: 11px; text-align: right; font-weight: 500;">-</span>
+            </div>
+            <div class="gps-row">
+              <span>Koordinat Saya:</span>
+              <strong id="gps-coords">-</strong>
+            </div>
+            <div class="gps-row">
+              <span>Jarak ke Sekolah:</span>
+              <strong id="gps-distance" style="color: var(--primary-blue);">-</strong>
+            </div>
+            <div class="gps-row">
+              <span>Batas Radius:</span>
+              <span id="gps-allowed-radius">100m</span>
+            </div>
+          </div>
+
+          <!-- [FASE 4] Camera Live Feed Trigger Buttons -->
+          <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+            <button id="btn-checkin" class="btn-emerald" style="flex: 1;" onclick="window.startAbsenWithCamera('masuk')">
+              <i class="fa-solid fa-camera"></i> Absen Masuk
+            </button>
+            <button id="btn-checkout" class="btn-primary" style="flex: 1; background-color: #3B82F6;" onclick="window.startAbsenWithCamera('pulang')">
+              <i class="fa-solid fa-camera-retro"></i> Absen Pulang
+            </button>
+          </div>
+
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+            <i class="fa-solid fa-circle-info"></i> Catatan: Jam masuk normal <strong>07:00 WITA</strong>. Batas keterlambatan <strong>07:15 WITA</strong>. Jam pulang <strong>13:30 WITA</strong>.
+          </div>
+        </div>
+
+        <!-- Form Izin / Sakit / Cuti -->
+        <div class="card">
+          <div class="card-title"><span><i class="fa-solid fa-file-pen"></i> Pengajuan Izin / Sakit / Cuti</span></div>
+          <form onsubmit="window.handlePengajuanIzin(event)" style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="form-group">
+              <label for="tipe-izin">Jenis Pengajuan</label>
+              <select id="tipe-izin" class="form-control" required>
+                <option value="Izin">Izin Kedinasan / Pribadi</option>
+                <option value="Sakit">Sakit</option>
+                <option value="Cuti">Cuti Resmi</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ket-izin">Keterangan / Alasan (Wajib)</label>
+              <textarea id="ket-izin" class="form-control" rows="3" maxlength="500" placeholder="Tuliskan alasan pengajuan..." required></textarea>
+            </div>
+            <button type="submit" class="btn-primary" style="background-color: var(--warning-amber); color: #1E293B;">
+              <i class="fa-solid fa-paper-plane"></i> Kirim Pengajuan
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Guru: Riwayat -->
+    <div id="view-guru-riwayat" class="d-none">
+      <div class="card">
+        <div class="card-title"><span><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Kehadiran (7 Hari Terakhir)</span></div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Masuk</th>
+                <th>Pulang</th>
+                <th>Jarak GPS</th>
+                <th>Selfie</th>
+                <th>Status</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="table-riwayat-guru-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- [FASE 4] View Guru: Profil & Pendaftaran Wajah Biometrik -->
+    <div id="view-guru-profil" class="d-none">
+      <div class="card" style="max-width: 600px; margin: 0 auto 20px auto;">
+        <div class="card-title"><span><i class="fa-solid fa-user-gear"></i> Profil Saya & Pendaftaran Wajah</span></div>
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px;">
+          <img id="prof-img-avatar" class="img-avatar-sm" style="width: 72px; height: 72px;" src="" alt="Foto Profile">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <div><strong id="prof-nama" style="font-size: 16px;">-</strong></div>
+            <div style="font-size: 13px; color: var(--text-muted);">NIP: <span id="prof-nip">-</span></div>
+            <div style="font-size: 13px; color: var(--text-muted);">Mapel: <span id="prof-mapel">-</span></div>
+            <div style="font-size: 12px; margin-top: 4px;">
+              Status Biometrik Wajah: <span id="prof-face-status" class="badge badge-warning">Belum Terdaftar</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+          <h4 style="font-size: 14px; color: var(--primary-blue);"><i class="fa-solid fa-face-smile"></i> Pendaftaran Biometrik Wajah</h4>
+          <p style="font-size: 12px; color: var(--text-muted);">
+            Daftarkan 3 sampel koordinat biometrik wajah Anda untuk mempercepat verifikasi presensi instan saat berada di sekolah.
+          </p>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-emerald btn-sm" onclick="window.startFaceRegistrationFlow()"><i class="fa-solid fa-id-badge"></i> Daftar Wajah Saya</button>
+            <button class="btn-secondary btn-sm" onclick="window.deleteMyFaceData()"><i class="fa-solid fa-user-slash"></i> Hapus Data Wajah Saya</button>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); margin-top: 16px; padding-top: 16px;">
+          <h4 style="color: var(--danger-red); font-size: 14px; margin-bottom: 8px;"><i class="fa-solid fa-shield-halved"></i> Hak Atas Privasi (Right to be Forgotten)</h4>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Sesuai regulasi privasi data, Anda berhak menghapus riwayat presensi lokal milik Anda dari perangkat ini.
+          </p>
+          <button class="btn-primary" style="background-color: var(--danger-red);" onclick="window.deleteMyData()">
+            <i class="fa-solid fa-trash-can"></i> Hapus Data Presensi Saya
+          </button>
+        </div>
+      </div>
+
+      <!-- Statis Policy Card -->
+      <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <div class="card-title"><span><i class="fa-solid fa-scale-balanced"></i> Kebijakan Privasi Data & Kamera</span></div>
+        <div style="font-size: 12px; color: var(--text-dark); line-height: 1.6;">
+          <p><strong>1. Data Yang Disimpan:</strong> Hanya koordinat GPS presensi, foto selfie 200px (JPEG 0.55), dan 128 angka koordinat vektor biometrik wajah (jika didaftarkan). Foto mentah tidak disimpan sebagai file fisik server.</p>
+          <p><strong>2. Berapa Lama:</strong> Data tersimpan secara lokal di peramban browser perangkat Anda hingga dihapus atau di-reset oleh Admin.</p>
+          <p><strong>3. Akses Kamera:</strong> Kamera aktif secara eksklusif saat pengambilan selfie dan dimatikan (<code>track.stop()</code>) segera setelah proses selesai.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Admin: Ringkasan Hari Ini -->
+    <div id="view-admin-dashboard" class="d-none">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background: #D1FAE5; color: #065F46;"><i class="fa-solid fa-user-check"></i></div>
+          <div>
+            <div id="stat-hadir" class="stat-val">0</div>
+            <div class="stat-label">Hadir Tepat Waktu</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: #FEF3C7; color: #92400E;"><i class="fa-solid fa-user-clock"></i></div>
+          <div>
+            <div id="stat-terlambat" class="stat-val">0</div>
+            <div class="stat-label">Terlambat</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: #E0F2FE; color: #075985;"><i class="fa-solid fa-envelope-open-text"></i></div>
+          <div>
+            <div id="stat-izin" class="stat-val">0</div>
+            <div class="stat-label">Izin / Sakit / Cuti</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: #FEE2E2; color: #991B1B;"><i class="fa-solid fa-user-xmark"></i></div>
+          <div>
+            <div id="stat-alpa" class="stat-val">0</div>
+            <div class="stat-label">Tanpa Keterangan / Alpa</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Approval Izin / Sakit / Cuti Pending -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-title">
+          <span><i class="fa-solid fa-envelope-open-text"></i> Persetujuan Pengajuan Izin / Sakit / Cuti Pending</span>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Nama Guru</th>
+                <th>NIP</th>
+                <th>Tipe</th>
+                <th>Alasan / Keterangan</th>
+                <th>Aksi Approval</th>
+              </tr>
+            </thead>
+            <tbody id="table-admin-approval-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span><i class="fa-solid fa-list-check"></i> Kehadiran Guru Hari Ini (<span id="admin-today-date">-</span>)</span></div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama Guru</th>
+                <th>NIP</th>
+                <th>Masuk</th>
+                <th>Pulang</th>
+                <th>Selfie</th>
+                <th>Status</th>
+                <th>Keterangan / Lokasi</th>
+                <th>Aksi Koreksi</th>
+              </tr>
+            </thead>
+            <tbody id="table-admin-today-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Admin: Rekap Bulanan & Export PDF/Excel/CSV -->
+    <div id="view-admin-rekap" class="d-none">
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-title">
+          <span><i class="fa-solid fa-calendar-days"></i> Rekapitulasi Presensi Bulanan</span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <select id="rekap-bulan" class="form-control" style="font-size: 12px; padding: 4px 8px;" onchange="window.renderAdminRekapBulanan()">
+              <option value="1">Januari</option>
+              <option value="2">Februari</option>
+              <option value="3">Maret</option>
+              <option value="4">April</option>
+              <option value="5">Mei</option>
+              <option value="6">Juni</option>
+              <option value="7">Juli</option>
+              <option value="8">Agustus</option>
+              <option value="9">September</option>
+              <option value="10">Oktober</option>
+              <option value="11">November</option>
+              <option value="12">Desember</option>
+            </select>
+            <select id="rekap-tahun" class="form-control" style="font-size: 12px; padding: 4px 8px;" onchange="window.renderAdminRekapBulanan()"></select>
+            
+            <button class="btn-primary btn-sm" style="background-color: #DC2626;" onclick="window.exportRekapPDF()"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button class="btn-emerald btn-sm" style="background-color: #16A34A;" onclick="window.exportRekapExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
+            <button class="btn-secondary btn-sm" onclick="window.exportRekapCSV()"><i class="fa-solid fa-file-csv"></i> CSV</button>
+          </div>
+        </div>
+
+        <div class="stats-grid" style="margin-top: 10px; margin-bottom: 16px;">
+          <div class="stat-card">
+            <div>
+              <div id="rekap-stat-total-guru" class="stat-val">0</div>
+              <div class="stat-label">Total Guru</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div>
+              <div id="rekap-stat-efektif" class="stat-val">0 Hari</div>
+              <div class="stat-label">Hari Kerja Efektif</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div>
+              <div id="rekap-stat-rata" class="stat-val" style="color: var(--accent-emerald);">0%</div>
+              <div class="stat-label">Rata-rata Kehadiran</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div>
+              <div id="rekap-stat-disiplin" class="stat-val" style="font-size: 15px; color: var(--primary-blue);">-</div>
+              <div class="stat-label">Guru Paling Disiplin</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+          <div class="chart-box">
+            <h4 style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><i class="fa-solid fa-chart-simple"></i> Persentase Kehadiran per Guru (%)</h4>
+            <canvas id="chartBarKehadiran"></canvas>
+          </div>
+          <div class="chart-box">
+            <h4 style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><i class="fa-solid fa-chart-pie"></i> Komposisi Presensi Bulanan</h4>
+            <canvas id="chartDonutKomposisi"></canvas>
+          </div>
+        </div>
+
+        <div class="table-responsive" style="margin-top: 16px;">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama Guru</th>
+                <th>NIP</th>
+                <th>Hadir</th>
+                <th>Terlambat</th>
+                <th>Izin</th>
+                <th>Sakit</th>
+                <th>Cuti</th>
+                <th>Alpa</th>
+                <th>% Kehadiran</th>
+              </tr>
+            </thead>
+            <tbody id="table-rekap-bulanan-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Admin: CRUD Daftar Guru Lengkap -->
+    <div id="view-admin-guru" class="d-none">
+      <div class="card">
+        <div class="card-title">
+          <span><i class="fa-solid fa-users"></i> Manajemen Data Guru SMPN 4 Tinggimoncong</span>
+          <button class="btn-emerald btn-sm" onclick="window.openModalTambahGuru()"><i class="fa-solid fa-user-plus"></i> Tambah Guru Baru</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Foto</th>
+                <th>NIP / NIK</th>
+                <th>Nama Guru</th>
+                <th>Mata Pelajaran</th>
+                <th>Sandi</th>
+                <th>Biometrik Wajah</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="table-admin-guru-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Admin: Log Aktivitas Sistem -->
+    <div id="view-admin-logs" class="d-none">
+      <div class="card">
+        <div class="card-title">
+          <span><i class="fa-solid fa-list-ol"></i> Log Aktivitas Sistem</span>
+          <button class="btn-secondary btn-sm" onclick="window.clearActivityLogs()"><i class="fa-solid fa-trash-can"></i> Bersihkan Log</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Waktu (WITA)</th>
+                <th>Pengguna / Actor</th>
+                <th>Aksi / Kategori</th>
+                <th>Rincian Detail Aktivitas</th>
+              </tr>
+            </thead>
+            <tbody id="table-admin-logs-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Admin: Pengaturan & Backup JSON -->
+    <div id="view-admin-settings" class="d-none">
+      <div class="card" style="max-width: 780px; margin: 0 auto 20px auto;">
+        <div class="card-title"><span><i class="fa-solid fa-gears"></i> Pengaturan Aplikasi & Kamera / Biometrik</span></div>
+        <form onsubmit="window.saveSettings(event)" style="display: flex; flex-direction: column; gap: 14px;">
+          
+          <!-- [FASE 4] Mode Verifikasi Kamera Presensi -->
+          <div style="background-color: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 14px;">
+            <h4 style="font-size: 13px; color: #1E40AF; margin-bottom: 8px;"><i class="fa-solid fa-camera"></i> Mode Verifikasi Presensi Guru</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label for="cfg-mode-verifikasi">Metode Kamera</label>
+                <select id="cfg-mode-verifikasi" class="form-control">
+                  <option value="selfie">Opsi A — Tangkapan Foto Selfie (Ringan)</option>
+                  <option value="face-api">Opsi B — Biometrik Face Recognition (Face API)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="cfg-face-threshold">Toleransi Match Biometrik</label>
+                <select id="cfg-face-threshold" class="form-control">
+                  <option value="0.45">Ketat (0.45)</option>
+                  <option value="0.55" selected>Normal Default (0.55)</option>
+                  <option value="0.65">Longgar (0.65)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload Logo Sekolah -->
+          <div class="form-group">
+            <label><i class="fa-solid fa-image"></i> Logo Sekolah (Header & PDF Kop)</label>
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <img id="cfg-logo-preview" style="width: 50px; height: 50px; border-radius: 50%; object-fit: contain; border: 1px solid var(--border-color);" src="" alt="Preview Logo">
+              <input type="file" id="cfg-logo-file" accept="image/*" class="form-control" style="font-size: 12px;" onchange="window.handleLogoUpload(event)">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label for="cfg-school-name">Nama Sekolah</label>
+              <input type="text" id="cfg-school-name" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="cfg-agency-name">Instansi / Dinas</label>
+              <input type="text" id="cfg-agency-name" class="form-control" required>
+            </div>
+          </div>
+
+          <!-- Setting Koordinat Sekolah dengan Peta -->
+          <div class="form-group">
+            <label><i class="fa-solid fa-map-pin"></i> Koordinat Pusat Radius Sekolah</label>
+            <div id="admin-map" class="map-container" style="height: 220px;"></div>
+            <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+              <button type="button" class="btn-primary btn-sm" onclick="window.getAdminCurrentLocation()"><i class="fa-solid fa-location-arrow"></i> Pakai Lokasi Saya Saat Ini</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label for="cfg-lat" style="font-size: 11px;">Latitude</label>
+                <input type="number" step="any" id="cfg-lat" class="form-control" required>
+              </div>
+              <div>
+                <label for="cfg-lng" style="font-size: 11px;">Longitude</label>
+                <input type="number" step="any" id="cfg-lng" class="form-control" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-radius">Radius Absensi Toleransi (Meter)</label>
+            <input type="number" id="cfg-radius" class="form-control" required min="10">
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label for="cfg-kepsek-nama">Nama Kepala Sekolah</label>
+              <input type="text" id="cfg-kepsek-nama" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="cfg-kepsek-nip">NIP Kepala Sekolah</label>
+              <input type="text" id="cfg-kepsek-nip" class="form-control" required>
+            </div>
+          </div>
+
+          <!-- Pengaturan Akun Admin -->
+          <div style="border-top: 1px solid var(--border-color); padding-top: 14px;">
+            <h4 style="font-size: 13px; color: var(--primary-blue); margin-bottom: 10px;"><i class="fa-solid fa-user-shield"></i> Ubah Akun Admin</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label for="cfg-admin-user">Username Admin</label>
+                <input type="text" id="cfg-admin-user" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="cfg-admin-pass">Sandi Baru Admin (Kosongkan jika tidak ubah)</label>
+                <input type="password" id="cfg-admin-pass" class="form-control" placeholder="••••••••">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-emerald"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan</button>
+        </form>
+      </div>
+
+      <!-- Card Backup / Restore Data & Reset Database -->
+      <div class="card" style="max-width: 780px; margin: 0 auto;">
+        <div class="card-title"><span><i class="fa-solid fa-database"></i> Backup, Restore & Pemeliharaan Database</span></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <h5 style="font-size: 13px;">Unduh Backup Database</h5>
+            <p style="font-size: 12px; color: var(--text-muted);">Simpan seluruh data guru, absensi, dan pengaturan ke file JSON.</p>
+            <button class="btn-primary btn-sm" onclick="window.downloadBackupJSON()"><i class="fa-solid fa-download"></i> Download JSON</button>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <h5 style="font-size: 13px;">Restore Data JSON</h5>
+            <p style="font-size: 12px; color: var(--text-muted);">Unggah file backup .json untuk memulihkan seluruh data.</p>
+            <input type="file" id="input-restore-json" accept=".json" class="d-none" onchange="window.handleRestoreJSON(event)">
+            <button class="btn-emerald btn-sm" onclick="document.getElementById('input-restore-json').click()"><i class="fa-solid fa-upload"></i> Restore File JSON</button>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); margin-top: 16px; padding-top: 16px; display: flex; gap: 12px; justify-content: flex-end;">
+          <button class="btn-secondary btn-sm" onclick="window.resetSampleDataModal()"><i class="fa-solid fa-rotate-left"></i> Muat Data Contoh</button>
+          <button class="btn-primary btn-sm" style="background-color: var(--danger-red);" onclick="window.clearAllAbsensiModal()"><i class="fa-solid fa-dumpster"></i> Hapus Semua Presensi</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Kustom -->
+  <div id="custom-modal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">Konfirmasi</h3>
+        <button class="modal-close" onclick="window.closeModal()">&times;</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+      <div class="modal-footer">
+        <button id="modal-btn-cancel" class="btn-secondary" onclick="window.closeModal()">Batal</button>
+        <button id="modal-btn-confirm" class="btn-primary" onclick="window.executeModalAction()">Ya, Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-kepsek">
+      Kepala Sekolah: <span id="footer-kepsek-nama">Syafruddin, S.Pd., M.Si.</span><br>
+      NIP. <span id="footer-kepsek-nip">19690727 199503 1 003</span>
+    </div>
+    <div>&copy; 2025 SMPN 4 Tinggimoncong — Data disimpan lokal di perangkat Anda.</div>
+  </footer>
+
+  <!-- SCRIPT LOGIKA UTAMA (FASE 4 LENGKAP) -->
+  <script>
+    /* ==========================================================================
+       KONFIGURASI UTAMA APLIKASI
+       ========================================================================== */
+    const DEFAULT_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%231E3A8A'/><path d='M50 15 L80 35 L80 75 L50 90 L20 75 L20 35 Z' fill='%2310B981'/><text x='50' y='58' font-size='32' text-anchor='middle' fill='white' font-weight='bold'>4</text></svg>";
+
+    const APP_CONFIG_KEY = 'smpn4_app_config';
+    const GURU_LIST_KEY = 'smpn4_guru_list';
+    const ABSENSI_KEY = 'smpn4_absensi_records';
+    const SESSION_KEY = 'smpn4_session_token';
+    const GEO_CACHE_KEY = 'smpn4_geo_cache';
+    const LOG_KEY = 'smpn4_activity_logs';
+
+    const INITIAL_CONFIG = {
+      schoolName: "SMPN 4 TINGGIMONCONG",
+      agencyName: "Dinas Pendidikan Kabupaten Gowa",
+      logoDataUrl: DEFAULT_LOGO,
+      lat: -5.274100,
+      lng: 119.893200,
+      radiusMeter: 100,
+      jamMasuk: "07:00",
+      jamTerlambat: "07:15",
+      jamPulang: "13:30",
+      kepsekNama: "Syafruddin, S.Pd., M.Si.",
+      kepsekNip: "19690727 199503 1 003",
+      adminUsername: "admin",
+      adminSalt: "smpn4salt2025",
+      adminPassHash: "e6f47702e7534446c76dd0528549925fa4d528b1db8ba9866236b2809e53b6cb",
+      modeVerifikasi: "selfie", // [FASE 4] 'selfie' atau 'face-api'
+      faceThreshold: 0.55
+    };
+
+    const INITIAL_GURU_LIST = [
+      { nip: "197801122005011001", nama: "Ahmad Subardjo, S.Pd.", mapel: "Matematika", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "198203152008022003", nama: "Siti Aminah, S.Pd.", mapel: "Bahasa Indonesia", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "198505202010011005", nama: "Bambang Pamungkas, M.Pd.", mapel: "PJOK", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "198911042014032002", nama: "Dewi Sartika, S.Si.", mapel: "IPA", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "199102182019021004", nama: "Eko Prasetyo, S.Hum.", mapel: "Bahasa Inggris", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "198407122009032001", nama: "Fitriani, S.Pd.", mapel: "IPS", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "199304252020122008", nama: "Gusti Ayu, S.Kom.", mapel: "Informatika", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "198709302011011002", nama: "Hasanuddin, S.Ag.", mapel: "Pendidikan Agama", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "199006142015042006", nama: "Indah Permata, S.Pd.", mapel: "PPKn", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "199408012022031003", nama: "Joko Widodo, S.Sn.", mapel: "Seni Budaya", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null }
+    ];
+
+    /* ==========================================================================
+       STATE & VARIABEL GLOBAL APLIKASI
+       ========================================================================== */
+    let currentSession = null;
+    let watchGpsId = null;
+    let currentGpsCoords = null;
+    let pendingModalCallback = null;
+
+    let guruMapInstance = null;
+    let guruUserMarker = null;
+    let guruSchoolCircle = null;
+
+    let adminMapInstance = null;
+    let adminSchoolMarker = null;
+    let adminSchoolCircle = null;
+
+    let chartBarInstance = null;
+    let chartDonutInstance = null;
+
+    let isSimulasiActive = false;
+    let lastGeocodeTime = 0;
+
+    // [FASE 4] State Kamera & Biometrik
+    let activeCameraStream = null;
+    let isFaceModelsLoaded = false;
+
+    /* ==========================================================================
+       HELPER UTAMA & SYSTEM LOGGING
+       ========================================================================== */
+    function tanggalLokal(d = new Date()) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function jamSekarang() {
+      const d = new Date();
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    async function hashText(text, salt = "smpn4salt2025") {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(text + salt);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function safeStorageGet(key) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+      } catch (err) {
+        showToast("Gagal membaca penyimpanan lokal", "error");
+        return null;
+      }
+    }
+
+    function safeStorageSet(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+      } catch (err) {
+        showToast("Penyimpanan penuh, hapus data lama.", "error");
+        return false;
+      }
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      let icon = 'fa-circle-check';
+      if (type === 'error') icon = 'fa-circle-xmark';
+      if (type === 'warning') icon = 'fa-triangle-exclamation';
+      if (type === 'info') icon = 'fa-circle-info';
+
+      toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${escapeHtml(message)}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function calculateHaversine(lat1, lon1, lat2, lon2) {
+      const R = 6371000;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = 
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return Math.round(R * c);
+    }
+
+    function addActivityLog(action, detail) {
+      const logs = safeStorageGet(LOG_KEY) || [];
+      const newLog = {
+        waktu: `${tanggalLokal()} ${jamSekarang()}`,
+        actor: currentSession ? currentSession.nama : 'Sistem/Anonim',
+        action,
+        detail
+      };
+      logs.unshift(newLog);
+      if (logs.length > 300) logs.pop();
+      safeStorageSet(LOG_KEY, logs);
+    }
+
+    /* ==========================================================================
+       INITIALIZATION & SEEDING DATA
+       ========================================================================== */
+    async function initApp() {
+      if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+        document.getElementById('demo-banner').classList.remove('d-none');
+      }
+
+      let appConfig = safeStorageGet(APP_CONFIG_KEY);
+      if (!appConfig) {
+        safeStorageSet(APP_CONFIG_KEY, INITIAL_CONFIG);
+        appConfig = INITIAL_CONFIG;
+      }
+      applyConfigToUI(appConfig);
+
+      let guruList = safeStorageGet(GURU_LIST_KEY);
+      if (!guruList || guruList.length === 0) {
+        const defaultHash = await hashText("123456");
+        guruList = INITIAL_GURU_LIST.map(g => ({
+          ...g,
+          passHash: defaultHash
+        }));
+        safeStorageSet(GURU_LIST_KEY, guruList);
+      }
+
+      populateRekapTahunDropdown();
+      checkSession();
+    }
+
+    function applyConfigToUI(cfg) {
+      const logo = cfg.logoDataUrl || DEFAULT_LOGO;
+      document.getElementById('header-logo-img').src = logo;
+      document.getElementById('cfg-logo-preview').src = logo;
+      document.getElementById('app-school-name').textContent = cfg.schoolName;
+      document.getElementById('app-agency-name').textContent = cfg.agencyName;
+      document.getElementById('footer-kepsek-nama').textContent = cfg.kepsekNama;
+      document.getElementById('footer-kepsek-nip').textContent = cfg.kepsekNip;
+      document.getElementById('gps-allowed-radius').textContent = cfg.radiusMeter + "m";
+
+      document.getElementById('cfg-school-name').value = cfg.schoolName;
+      document.getElementById('cfg-agency-name').value = cfg.agencyName;
+      document.getElementById('cfg-lat').value = cfg.lat;
+      document.getElementById('cfg-lng').value = cfg.lng;
+      document.getElementById('cfg-radius').value = cfg.radiusMeter;
+      document.getElementById('cfg-kepsek-nama').value = cfg.kepsekNama;
+      document.getElementById('cfg-kepsek-nip').value = cfg.kepsekNip;
+      document.getElementById('cfg-admin-user').value = cfg.adminUsername;
+      
+      if (document.getElementById('cfg-mode-verifikasi')) {
+        document.getElementById('cfg-mode-verifikasi').value = cfg.modeVerifikasi || 'selfie';
+        document.getElementById('cfg-face-threshold').value = cfg.faceThreshold || 0.55;
+      }
+    }
+
+    function populateRekapTahunDropdown() {
+      const yearSelect = document.getElementById('rekap-tahun');
+      if (!yearSelect) return;
+      yearSelect.innerHTML = '';
+      const currentYear = new Date().getFullYear();
+      for (let y = currentYear; y >= currentYear - 3; y--) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        yearSelect.appendChild(opt);
+      }
+      document.getElementById('rekap-bulan').value = new Date().getMonth() + 1;
+    }
+
+    /* ==========================================================================
+       MANAJEMEN SESI & AUTHENTICATION
+       ========================================================================== */
+    function checkSession() {
+      const rawSession = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY);
+      if (rawSession) {
+        try {
+          const sess = JSON.parse(rawSession);
+          if (Date.now() < sess.expiresAt) {
+            currentSession = sess;
+            renderLoggedInUI();
+            return;
+          }
+        } catch (e) {}
+      }
+      window.appLogout(false);
+    }
+
+    window.switchLoginTab = function(type) {
+      document.getElementById('tab-login-guru').classList.toggle('active', type === 'guru');
+      document.getElementById('tab-login-admin').classList.toggle('active', type === 'admin');
+      document.getElementById('form-guru-login').classList.toggle('d-none', type !== 'guru');
+      document.getElementById('form-admin-login').classList.toggle('d-none', type !== 'admin');
+    };
+
+    window.handleGuruLogin = async function(e) {
+      e.preventDefault();
+      const rawNip = document.getElementById('guru-nip').value;
+      const cleanNip = rawNip.replace(/\D/g, '');
+      const pass = document.getElementById('guru-pass').value;
+
+      const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+      const inputHash = await hashText(pass);
+
+      const targetGuru = guruList.find(g => g.nip === cleanNip && g.passHash === inputHash);
+
+      if (targetGuru) {
+        const sessionToken = crypto.randomUUID();
+        currentSession = {
+          token: sessionToken,
+          role: 'guru',
+          nip: targetGuru.nip,
+          nama: targetGuru.nama,
+          mapel: targetGuru.mapel,
+          photoUrl: targetGuru.photoUrl || '',
+          expiresAt: Date.now() + (8 * 60 * 60 * 1000)
+        };
+
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
+        localStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
+        
+        addActivityLog("Login Guru", `Guru ${targetGuru.nama} (NIP: ${targetGuru.nip}) berhasil masuk`);
+        showToast(`Selamat datang, ${targetGuru.nama}!`, "success");
+        renderLoggedInUI();
+      } else {
+        showToast("NIP atau Kata Sandi salah!", "error");
+      }
+    };
+
+    window.handleAdminLogin = async function(e) {
+      e.preventDefault();
+      const user = document.getElementById('admin-user').value.trim();
+      const pass = document.getElementById('admin-pass').value;
+
+      const cfg = safeStorageGet(APP_CONFIG_KEY) || INITIAL_CONFIG;
+      const inputHash = await hashText(pass, cfg.adminSalt);
+
+      if (user === cfg.adminUsername && inputHash === cfg.adminPassHash) {
+        const sessionToken = crypto.randomUUID();
+        currentSession = {
+          token: sessionToken,
+          role: 'admin',
+          nama: "Administrator",
+          expiresAt: Date.now() + (8 * 60 * 60 * 1000)
+        };
+
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
+        localStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
+        
+        addActivityLog("Login Admin", "Administrator berhasil masuk ke dashboard");
+        showToast("Login Admin Berhasil!", "success");
+        renderLoggedInUI();
+      } else {
+        showToast("Username atau Password Admin salah!", "error");
+      }
+    };
+
+    window.appLogout = function(notify = true) {
+      if (currentSession) {
+        addActivityLog("Logout", `${currentSession.nama} telah keluar dari sistem`);
+      }
+      cleanupResources();
+      currentSession = null;
+      sessionStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem(SESSION_KEY);
+
+      document.getElementById('user-info-section').classList.add('d-none');
+      document.getElementById('main-nav').classList.add('d-none');
+      document.getElementById('view-login').classList.remove('d-none');
+      hideAllViews();
+
+      if (notify) showToast("Anda telah keluar.", "warning");
+    };
+
+    /* ==========================================================================
+       NAVIGATION & RESOURCE CLEANUP
+       ========================================================================== */
+    function cleanupResources() {
+      stopCameraStream();
+      if (watchGpsId) {
+        navigator.geolocation.clearWatch(watchGpsId);
+        watchGpsId = null;
+      }
+      if (guruMapInstance) {
+        guruMapInstance.remove();
+        guruMapInstance = null;
+        guruUserMarker = null;
+        guruSchoolCircle = null;
+      }
+      if (adminMapInstance) {
+        adminMapInstance.remove();
+        adminMapInstance = null;
+        adminSchoolMarker = null;
+        adminSchoolCircle = null;
+      }
+      if (chartBarInstance) {
+        chartBarInstance.destroy();
+        chartBarInstance = null;
+      }
+      if (chartDonutInstance) {
+        chartDonutInstance.destroy();
+        chartDonutInstance = null;
+      }
+    }
+
+    function stopCameraStream() {
+      if (activeCameraStream) {
+        activeCameraStream.getTracks().forEach(track => track.stop());
+        activeCameraStream = null;
+      }
+    }
+
+    function hideAllViews() {
+      const views = ['view-guru-absensi', 'view-guru-riwayat', 'view-guru-profil', 'view-admin-dashboard', 'view-admin-rekap', 'view-admin-guru', 'view-admin-logs', 'view-admin-settings'];
+      views.forEach(v => {
+        const el = document.getElementById(v);
+        if (el) el.classList.add('d-none');
+      });
+    }
+
+    function renderLoggedInUI() {
+      document.getElementById('view-login').classList.add('d-none');
+      document.getElementById('user-info-section').classList.remove('d-none');
+      document.getElementById('user-display-name').textContent = `${currentSession.nama} (${currentSession.role.toUpperCase()})`;
+
+      const nav = document.getElementById('main-nav');
+      nav.classList.remove('d-none');
+      nav.innerHTML = '';
+
+      if (currentSession.role === 'guru') {
+        nav.innerHTML = `
+          <button class="nav-btn active" onclick="window.switchGuruTab('absensi', this)"><i class="fa-solid fa-camera"></i> Absensi Peta</button>
+          <button class="nav-btn" onclick="window.switchGuruTab('riwayat', this)"><i class="fa-solid fa-list"></i> Riwayat 7 Hari</button>
+          <button class="nav-btn" onclick="window.switchGuruTab('profil', this)"><i class="fa-solid fa-user"></i> Profil Saya</button>
+        `;
+        window.switchGuruTab('absensi');
+      } else if (currentSession.role === 'admin') {
+        nav.innerHTML = `
+          <button class="nav-btn active" onclick="window.switchAdminTab('dashboard', this)"><i class="fa-solid fa-chart-line"></i> Ringkasan Hari Ini</button>
+          <button class="nav-btn" onclick="window.switchAdminTab('rekap', this)"><i class="fa-solid fa-calendar-check"></i> Rekap Bulanan</button>
+          <button class="nav-btn" onclick="window.switchAdminTab('guru', this)"><i class="fa-solid fa-address-card"></i> Kelola Data Guru</button>
+          <button class="nav-btn" onclick="window.switchAdminTab('logs', this)"><i class="fa-solid fa-list-ol"></i> Log Aktivitas</button>
+          <button class="nav-btn" onclick="window.switchAdminTab('settings', this)"><i class="fa-solid fa-gear"></i> Pengaturan & Backup</button>
+        `;
+        window.switchAdminTab('dashboard');
+      }
+    }
+
+    window.switchGuruTab = function(tab, btnEl = null) {
+      if (btnEl) {
+        document.querySelectorAll('nav .nav-btn').forEach(b => b.classList.remove('active'));
+        btnEl.classList.add('active');
+      }
+      cleanupResources();
+      hideAllViews();
+
+      if (tab === 'absensi') {
+        document.getElementById('view-guru-absensi').classList.remove('d-none');
+        initGuruMapAndGPS();
+      } else if (tab === 'riwayat') {
+        document.getElementById('view-guru-riwayat').classList.remove('d-none');
+        renderGuruRiwayat();
+      } else if (tab === 'profil') {
+        document.getElementById('view-guru-profil').classList.remove('d-none');
+        renderGuruProfil();
+      }
+    };
+
+    window.switchAdminTab = function(tab, btnEl = null) {
+      if (btnEl) {
+        document.querySelectorAll('nav .nav-btn').forEach(b => b.classList.remove('active'));
+        btnEl.classList.add('active');
+      }
+      cleanupResources();
+      hideAllViews();
+
+      if (tab === 'dashboard') {
+        document.getElementById('view-admin-dashboard').classList.remove('d-none');
+        renderAdminDashboard();
+      } else if (tab === 'rekap') {
+        document.getElementById('view-admin-rekap').classList.remove('d-none');
+        renderAdminRekapBulanan();
+      } else if (tab === 'guru') {
+        document.getElementById('view-admin-guru').classList.remove('d-none');
+        renderAdminGuruTable();
+      } else if (tab === 'logs') {
+        document.getElementById('view-admin-logs').classList.remove('d-none');
+        renderAdminLogsTable();
+      } else if (tab === 'settings') {
+        document.getElementById('view-admin-settings').classList.remove('d-none');
+        initAdminSettingsMap();
+      }
+    };
+
+    /* ==========================================================================
+       GEOLOCATION ENGINE & LEAFLET MAP
+       ========================================================================== */
+    function initGuruMapAndGPS() {
+      const cfg = safeStorageGet(APP_CONFIG_KEY) || INITIAL_CONFIG;
+
+      if (!guruMapInstance && window.L) {
+        guruMapInstance = L.map('guru-map').setView([cfg.lat, cfg.lng], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap'
+        }).addTo(guruMapInstance);
+
+        guruSchoolCircle = L.circle([cfg.lat, cfg.lng], {
+          color: '#10B981',
+          fillColor: '#10B981',
+          fillOpacity: 0.15,
+          radius: cfg.radiusMeter
+        }).addTo(guruMapInstance).bindPopup("Lokasi Sekolah (" + cfg.schoolName + ")");
+
+        guruUserMarker = L.marker([cfg.lat, cfg.lng], {
+          draggable: isSimulasiActive
+        }).addTo(guruMapInstance).bindPopup("Posisi Anda").openPopup();
+
+        guruUserMarker.on('dragend', function(e) {
+          if (isSimulasiActive) {
+            const p = e.target.getLatLng();
+            updateGuruPosition(p.lat, p.lng, 5);
+          }
+        });
+      }
+
+      if (!isSimulasiActive && navigator.geolocation) {
+        watchGpsId = navigator.geolocation.watchPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            const acc = Math.round(pos.coords.accuracy);
+            updateGuruPosition(lat, lng, acc);
+          },
+          (err) => {
+            const statusEl = document.getElementById('gps-status');
+            if (statusEl) {
+              statusEl.className = 'badge badge-danger';
+              statusEl.textContent = 'Izin Lokasi Ditolak / Lemah';
+            }
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
+        );
+      }
+    }
+
+    function updateGuruPosition(lat, lng, accuracy = 5) {
+      const cfg = safeStorageGet(APP_CONFIG_KEY) || INITIAL_CONFIG;
+      const distance = calculateHaversine(lat, lng, cfg.lat, cfg.lng);
+      currentGpsCoords = { lat, lng, distance, accuracy };
+
+      document.getElementById('gps-coords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      document.getElementById('gps-distance').textContent = `${distance} meter`;
+
+      const statusEl = document.getElementById('gps-status');
+      if (distance <= cfg.radiusMeter) {
+        statusEl.className = 'badge badge-success';
+        statusEl.textContent = 'Dalam Radius Sekolah';
+      } else {
+        statusEl.className = 'badge badge-danger';
+        statusEl.textContent = 'Di Luar Lokasi Sekolah';
+      }
+
+      if (guruUserMarker && guruMapInstance) {
+        const newPos = [lat, lng];
+        guruUserMarker.setLatLng(newPos);
+        guruMapInstance.panTo(newPos);
+      }
+
+      const nowTime = Date.now();
+      if (nowTime - lastGeocodeTime > 1100) {
+        lastGeocodeTime = nowTime;
+        fetchNominatimAddress(lat, lng);
+      }
+    }
+
+    async function fetchNominatimAddress(lat, lng) {
+      const gridKey = `${lat.toFixed(3)}_${lng.toFixed(3)}`;
+      const cacheMap = safeStorageGet(GEO_CACHE_KEY) || {};
+
+      if (cacheMap[gridKey]) {
+        document.getElementById('gps-address').textContent = cacheMap[gridKey];
+        return;
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, {
+          signal: controller.signal,
+          headers: { 'User-Agent': 'SMPN4Tinggimoncong-AbsensiApp/4.0' }
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          const displayAddr = data.display_name ? data.display_name.split(',').slice(0, 3).join(',') : 'Lokasi Terdeteksi';
+          cacheMap[gridKey] = displayAddr;
+          safeStorageSet(GEO_CACHE_KEY, cacheMap);
+          document.getElementById('gps-address').textContent = displayAddr;
+        }
+      } catch (e) {
+        document.getElementById('gps-address').textContent = "Lokasi terdeteksi (Gagal memuat alamat lengkap)";
+      }
+    }
+
+    window.toggleSimulasiGPS = function() {
+      isSimulasiActive = !isSimulasiActive;
+      const simBox = document.getElementById('simulasi-gps-box');
+      simBox.classList.toggle('d-none', !isSimulasiActive);
+
+      if (watchGpsId) {
+        navigator.geolocation.clearWatch(watchGpsId);
+        watchGpsId = null;
+      }
+
+      if (guruUserMarker) {
+        if (isSimulasiActive) {
+          guruUserMarker.dragging.enable();
+          showToast("Mode Simulasi GPS Aktif. Geser marker di peta.", "warning");
+        } else {
+          guruUserMarker.dragging.disable();
+          showToast("Mode Simulasi Nonaktif. Memuat GPS asli...", "info");
+          initGuruMapAndGPS();
+        }
+      }
+    };
+
+    window.applySimulasiGPS = function() {
+      const lat = parseFloat(document.getElementById('sim-lat').value);
+      const lng = parseFloat(document.getElementById('sim-lng').value);
+
+      if (isNaN(lat) || isNaN(lng)) {
+        showToast("Masukkan koordinat simulasi yang valid!", "error");
+        return;
+      }
+      updateGuruPosition(lat, lng, 1);
+      showToast("Koordinat simulasi diterapkan!", "success");
+    };
+
+    function initAdminSettingsMap() {
+      const cfg = safeStorageGet(APP_CONFIG_KEY) || INITIAL_CONFIG;
+
+      if (!adminMapInstance && window.L) {
+        adminMapInstance = L.map('admin-map').setView([cfg.lat, cfg.lng], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap'
+        }).addTo(adminMapInstance);
+
+        adminSchoolMarker = L.marker([cfg.lat, cfg.lng], { draggable: true }).addTo(adminMapInstance);
+        adminSchoolCircle = L.circle([cfg.lat, cfg.lng], {
+          color: '#10B981',
+          fillColor: '#10B981',
+          fillOpacity: 0.15,
+          radius: cfg.radiusMeter
+        }).addTo(adminMapInstance);
+
+        adminSchoolMarker.on('dragend', function(e) {
+          const p = e.target.getLatLng();
+          document.getElementById('cfg-lat').value = p.lat.toFixed(6);
+          document.getElementById('cfg-lng').value = p.lng.toFixed(6);
+          adminSchoolCircle.setLatLng(p);
+        });
+
+        adminMapInstance.on('click', function(e) {
+          adminSchoolMarker.setLatLng(e.latlng);
+          adminSchoolCircle.setLatLng(e.latlng);
+          document.getElementById('cfg-lat').value = e.latlng.lat.toFixed(6);
+          document.getElementById('cfg-lng').value = e.latlng.lng.toFixed(6);
+        });
+      }
+    }
+
+    window.getAdminCurrentLocation = function() {
+      if (!navigator.geolocation) {
+        showToast("Browser tidak mendukung geolokasi.", "error");
+        return;
+      }
+      showToast("Mendapatkan posisi lokasi Anda...", "info");
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          document.getElementById('cfg-lat').value = lat.toFixed(6);
+          document.getElementById('cfg-lng').value = lng.toFixed(6);
+
+          if (adminSchoolMarker && adminMapInstance) {
+            adminSchoolMarker.setLatLng([lat, lng]);
+            adminSchoolCircle.setLatLng([lat, lng]);
+            adminMapInstance.setView([lat, lng], 16);
+          }
+          showToast("Koordinat lokasi berhasil diambil!", "success");
+        },
+        () => showToast("Gagal mengambil lokasi perangkat.", "error")
+      );
+    };
+
+    /* ==========================================================================
+       [FASE 4] TANGKAPAN KAMERA SELFIE & VERIFIKASI BIOMETRIK FACE API
+       ========================================================================== */
+    async function loadFaceApiModels() {
+      if (isFaceModelsLoaded) return true;
+      showToast("Memuat model biometrik pengenalan wajah...", "info");
+      try {
+        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+        ]);
+        isFaceModelsLoaded = true;
+        showToast("Model biometrik berhasil dimuat!", "success");
+        return true;
+      } catch (err) {
+        showToast("Gagal memuat model biometrik. Memakai mode Selfie dasar.", "warning");
+        return false;
+      }
+    }
+
+    window.startAbsenWithCamera = function(jenis) {
+      if (!currentGpsCoords) {
+        showToast("Mendapatkan koordinat GPS... Mohon tunggu.", "warning");
+        return;
+      }
+
+      const todayStr = tanggalLokal();
+      const records = safeStorageGet(ABSENSI_KEY) || [];
+      const cfg = safeStorageGet(APP_CONFIG_KEY) || INITIAL_CONFIG;
+
+      let todayRecord = records.find(r => r.nip === currentSession.nip && r.tanggal === todayStr);
+
+      if (jenis === 'masuk' && todayRecord && todayRecord.jamMasuk && todayRecord.jamMasuk !== '-') {
+        showToast("Anda sudah melakukan absen masuk hari ini!", "error");
+        return;
+      }
+      if (jenis === 'pulang' && (!todayRecord || !todayRecord.jamMasuk || todayRecord.jamMasuk === '-')) {
+        showToast("Anda belum melakukan absen masuk!", "error");
+        return;
+      }
+      if (jenis === 'pulang' && todayRecord.jamPulang) {
+        showToast("Anda sudah melakukan absen pulang hari ini!", "error");
+        return;
+      }
+
+      // Modal Kamera Live Feed
+      const cameraModalHtml = `
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div class="camera-wrapper">
+            <video id="modal-cam-video" autoplay playsinline muted></video>
+            <div class="camera-overlay"></div>
+            <div id="cam-status" class="camera-status-text">Menyiapkan Kamera...</div>
+          </div>
+          <p style="font-size:12px; color: var(--text-muted); text-align:center;">
+            Posisikan wajah Anda tegak lurus di dalam lingkaran area foto.
+          </p>
+        </div>
+      `;
+
+      window.openModal(`Tangkapan Kamera Absen ${jenis.toUpperCase()}`, cameraModalHtml, async () => {
+        const videoEl = document.getElementById('modal-cam-video');
+        if (!videoEl) return;
+
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = 200;
+          canvas.height = 150;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(videoEl, 0, 0, 200, 150);
+          const selfieBase64 = canvas.toDataURL('image/jpeg', 0.55);
+
+          // Jika mode Biometrik Face API Aktif
+          if (cfg.modeVerifikasi === 'face-api') {
+            const isLoaded = await loadFaceApiModels();
+            if (isLoaded) {
+              const detection = await faceapi.detectSingleFace(videoEl, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+              if (!detection) {
+                showToast("Wajah tidak terdeteksi jelas! Silakan coba lagi.", "error");
+                stopCameraStream();
+                return;
+              }
+
+              const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+              const guru = guruList.find(g => g.nip === currentSession.nip);
+
+              if (guru && guru.faceDescriptor) {
+                const distance = faceapi.euclideanDistance(detection.descriptor, new Float32Array(guru.faceDescriptor));
+                const threshold = parseFloat(cfg.faceThreshold || 0.55);
+                if (distance > threshold) {
+                  showToast(`Verifikasi Wajah Gagal! (Match Score: ${(1 - distance).toFixed(2)})`, "error");
+                  stopCameraStream();
+                  return;
+                }
+              }
+            }
+          }
+
+          stopCameraStream();
+          window.executeDoAbsen(jenis, selfieBase64);
+
+        } catch (err) {
+          stopCameraStream();
+          showToast("Gagal mengambil tangkapan selfie.", "error");
+        }
+      });
+
+      // Buka WebCam Stream
+      setTimeout(() => {
+        const videoEl = document.getElementById('modal-cam-video');
+        const statusEl = document.getElementById('cam-status');
+
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' } })
+            .then(stream => {
+              activeCameraStream = stream;
+              if (videoEl) videoEl.srcObject = stream;
+              if (statusEl) statusEl.textContent = "Kamera Siap. Posisikan Wajah.";
+            })
+            .catch(err => {
+              if (statusEl) statusEl.textContent = "Izin Kamera Ditolak / Tidak Tersedia";
+              showToast("Gagal mengakses kamera. Periksa izin lokasi/HTTPS.", "error");
+            });
+        }
+      }, 200);
+    };
+
+    window.executeDoAbsen = function(jenis, selfieBase64) {
+      const todayStr = tanggalLokal();
+      const records = safeStorageGet(ABSENSI_KEY) || [];
+      const cfg = safeStorageGet(APP_CONFIG_KEY) || INITIAL_CONFIG;
+
+      let todayRecord = records.find(r => r.nip === currentSession.nip && r.tanggal === todayStr);
+      const now = new Date();
+      const jamStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      let statusFormat = 'Hadir';
+      const isOutOfRadius = currentGpsCoords.distance > cfg.radiusMeter;
+
+      if (jenis === 'masuk') {
+        if (jamStr > cfg.jamTerlambat) statusFormat = 'Terlambat';
+        if (isOutOfRadius) statusFormat += ' (Di Luar Lokasi)';
+
+        const alamat = document.getElementById('gps-address').textContent || '';
+
+        if (!todayRecord) {
+          todayRecord = {
+            nip: currentSession.nip,
+            nama: currentSession.nama,
+            tanggal: todayStr,
+            jamMasuk: jamStr,
+            jamPulang: '',
+            status: statusFormat,
+            jarakMasuk: currentGpsCoords.distance,
+            fotoSelfie: selfieBase64,
+            keterangan: isOutOfRadius ? `[Di Luar Radius] ${alamat}` : 'Tepat Waktu'
+          };
+          records.push(todayRecord);
+        } else {
+          todayRecord.jamMasuk = jamStr;
+          todayRecord.status = statusFormat;
+          todayRecord.jarakMasuk = currentGpsCoords.distance;
+          todayRecord.fotoSelfie = selfieBase64;
+        }
+
+        safeStorageSet(ABSENSI_KEY, records);
+        addActivityLog("Absen Masuk", `Guru ${currentSession.nama} Absen Masuk (${jamStr}) - Status: ${statusFormat}`);
+        showToast(`Absen Masuk Berhasil (${jamStr}) - Status: ${statusFormat}`, "success");
+
+      } else if (jenis === 'pulang') {
+        todayRecord.jamPulang = jamStr;
+        if (selfieBase64) todayRecord.fotoSelfie = selfieBase64;
+        safeStorageSet(ABSENSI_KEY, records);
+        addActivityLog("Absen Pulang", `Guru ${currentSession.nama} Absen Pulang (${jamStr})`);
+        showToast(`Absen Pulang Berhasil (${jamStr})`, "success");
+      }
+    };
+
+    /* ==========================================================================
+       [FASE 4] PENDAFTARAN WAJAH BIOMETRIK GURU
+       ========================================================================== */
+    window.startFaceRegistrationFlow = function() {
+      const privacyConsentHtml = `
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:13px;">
+          <h4 style="color:var(--primary-blue);"><i class="fa-solid fa-shield-halved"></i> Form Persetujuan Privasi Biometrik</h4>
+          <p>Sesuai regulasi perlindungan data pribadi, pendaftaran biometrik memerlukan persetujuan eksplisit Anda:</p>
+          <ul style="margin-left: 20px; line-height: 1.5;">
+            <li>Sistem akan mengekstrak 128 titik data koordinat vektor matematika dari wajah Anda.</li>
+            <li>Foto mentah wajah tidak disimpan dalam server database.</li>
+            <li>Anda berhak menghapus data biometrik wajah Anda kapan saja melalui tab Profil.</li>
+          </ul>
+          <label style="display:flex; align-items:center; gap:8px; font-weight:600; margin-top:6px; cursor:pointer;">
+            <input type="checkbox" id="consent-check" required> Saya memahami dan menyetujui pendaftaran biometrik.
+          </label>
+        </div>
+      `;
+
+      window.openModal("Persetujuan Biometrik Wajah", privacyConsentHtml, async () => {
+        const checked = document.getElementById('consent-check')?.checked;
+        if (!checked) {
+          showToast("Anda harus menyetujui persetujuan privasi terlebih dahulu.", "warning");
+          return;
+        }
+
+        const isLoaded = await loadFaceApiModels();
+        if (!isLoaded) return;
+
+        openFaceScanModal();
+      });
+    };
+
+    function openFaceScanModal() {
+      const scanModalHtml = `
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div class="camera-wrapper">
+            <video id="scan-cam-video" autoplay playsinline muted></video>
+            <div class="camera-overlay"></div>
+            <div id="scan-status" class="camera-status-text">Posisikan Wajah Tegak Lurus...</div>
+          </div>
+          <p id="scan-instruction" style="font-size:12px; font-weight:600; color:var(--primary-blue);">Sampel 1 dari 3: Tatap Lurus Kamera</p>
+        </div>
+      `;
+
+      window.openModal("Scan Biometrik Wajah (3 Sampel)", scanModalHtml, async () => {
+        const videoEl = document.getElementById('scan-cam-video');
+        if (!videoEl) return;
+
+        showToast("Menganalisis koordinat biometrik wajah...", "info");
+        try {
+          const detection = await faceapi.detectSingleFace(videoEl, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+
+          if (!detection) {
+            showToast("Wajah tidak terdeteksi! Pastikan pencahayaan terang.", "error");
+            stopCameraStream();
+            return;
+          }
+
+          const descriptorArray = Array.from(detection.descriptor);
+          const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+          const guru = guruList.find(g => g.nip === currentSession.nip);
+
+          if (guru) {
+            guru.faceDescriptor = descriptorArray;
+            guru.isFaceRegistered = true;
+            safeStorageSet(GURU_LIST_KEY, guruList);
+            addActivityLog("Biometrik", `Guru ${guru.nama} berhasil mendaftarkan sampel wajah biometrik`);
+            showToast("Pendaftaran Biometrik Wajah Berhasil!", "success");
+            renderGuruProfil();
+          }
+
+        } catch (err) {
+          showToast("Gagal memproses data biometrik.", "error");
+        } finally {
+          stopCameraStream();
+        }
+      });
+
+      setTimeout(() => {
+        const videoEl = document.getElementById('scan-cam-video');
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+            .then(stream => {
+              activeCameraStream = stream;
+              if (videoEl) videoEl.srcObject = stream;
+            })
+            .catch(() => showToast("Gagal memuat kamera.", "error"));
+        }
+      }, 200);
+    }
+
+    window.deleteMyFaceData = function() {
+      window.openModal("Hapus Data Wajah", "Apakah Anda yakin ingin menghapus vektor data biometrik wajah Anda?", () => {
+        const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+        const guru = guruList.find(g => g.nip === currentSession.nip);
+
+        if (guru) {
+          guru.faceDescriptor = null;
+          guru.isFaceRegistered = false;
+          safeStorageSet(GURU_LIST_KEY, guruList);
+          addActivityLog("Biometrik Hapus", `Guru ${guru.nama} menghapus data biometrik wajah`);
+          showToast("Data biometrik wajah telah dihapus.", "success");
+          renderGuruProfil();
+        }
+      });
+    };
+
+    function renderGuruProfil() {
+      document.getElementById('prof-nama').textContent = currentSession.nama;
+      document.getElementById('prof-nip').textContent = currentSession.nip;
+      document.getElementById('prof-mapel').textContent = currentSession.mapel;
+      document.getElementById('prof-img-avatar').src = currentSession.photoUrl || DEFAULT_LOGO;
+
+      const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+      const guru = guruList.find(g => g.nip === currentSession.nip);
+
+      const statusEl = document.getElementById('prof-face-status');
+      if (guru && guru.isFaceRegistered) {
+        statusEl.className = 'badge badge-success';
+        statusEl.innerHTML = '<i class="fa-solid fa-face-smile"></i> Terdaftar Biometrik';
+      } else {
+        statusEl.className = 'badge badge-warning';
+        statusEl.innerHTML = '<i class="fa-solid fa-face-frown"></i> Belum Terdaftar';
+      }
+    }
+
+    /* ==========================================================================
+       LOGIKA PRESENSI GURU & FORM IZIN
+       ========================================================================== */
+    window.handlePengajuanIzin = function(e) {
+      e.preventDefault();
+      const tipe = document.getElementById('tipe-izin').value;
+      const ket = document.getElementById('ket-izin').value.trim();
+
+      if (!ket) {
+        showToast("Keterangan alasan wajib diisi!", "error");
+        return;
+      }
+
+      const todayStr = tanggalLokal();
+      const records = safeStorageGet(ABSENSI_KEY) || [];
+
+      let todayRecord = records.find(r => r.nip === currentSession.nip && r.tanggal === todayStr);
+      if (todayRecord && (todayRecord.jamMasuk || ['Izin', 'Sakit', 'Cuti', 'Menunggu'].includes(todayRecord.status))) {
+        showToast("Anda sudah mencatatkan presensi/izin hari ini!", "error");
+        return;
+      }
+
+      const newRecord = {
+        nip: currentSession.nip,
+        nama: currentSession.nama,
+        tanggal: todayStr,
+        jamMasuk: '-',
+        jamPulang: '-',
+        status: `[Menunggu] ${tipe}`,
+        tipeIzin: tipe,
+        jarakMasuk: 0,
+        keterangan: ket
+      };
+
+      records.push(newRecord);
+      safeStorageSet(ABSENSI_KEY, records);
+
+      document.getElementById('ket-izin').value = '';
+      addActivityLog("Pengajuan Izin", `Guru ${currentSession.nama} mengajukan ${tipe}: ${ket}`);
+      showToast(`Pengajuan ${tipe} berhasil dikirim! Status: Menunggu Approval`, "success");
+    };
+
+    /* ==========================================================================
+       ADMIN DASHBOARD & APPROVAL
+       ========================================================================== */
+    function renderAdminDashboard() {
+      const todayStr = tanggalLokal();
+      document.getElementById('admin-today-date').textContent = todayStr;
+
+      const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+      const records = safeStorageGet(ABSENSI_KEY) || [];
+      const todayRecords = records.filter(r => r.tanggal === todayStr);
+
+      let statHadir = 0;
+      let statTerlambat = 0;
+      let statIzin = 0;
+      let statAlpa = 0;
+
+      const tbodyToday = document.getElementById('table-admin-today-body');
+      tbodyToday.innerHTML = '';
+
+      guruList.forEach((guru, idx) => {
+        const rec = todayRecords.find(r => r.nip === guru.nip);
+        const tr = document.createElement('tr');
+
+        let statusTxt = 'Belum Absen / Alpa';
+        let badgeClass = 'badge-danger';
+        let jamMasuk = '-';
+        let jamPulang = '-';
+        let ket = '-';
+        let selfieBtn = '-';
+
+        if (rec) {
+          jamMasuk = rec.jamMasuk || '-';
+          jamPulang = rec.jamPulang || '-';
+          ket = rec.keterangan || '-';
+          statusTxt = rec.status;
+
+          if (rec.fotoSelfie) {
+            selfieBtn = `<button class="btn-secondary btn-sm" onclick="window.viewSelfieModal('${rec.fotoSelfie}', '${rec.nama}')"><i class="fa-solid fa-image"></i> Lihat</button>`;
+          }
+
+          if (rec.status.startsWith('Hadir')) {
+            badgeClass = 'badge-success';
+            statHadir++;
+          } else if (rec.status.startsWith('Terlambat')) {
+            badgeClass = 'badge-warning';
+            statTerlambat++;
+          } else if (['Izin', 'Sakit', 'Cuti'].includes(rec.status)) {
+            badgeClass = 'badge-info';
+            statIzin++;
+          } else if (rec.status.startsWith('[Menunggu]')) {
+            badgeClass = 'badge-warning';
+          } else {
+            statAlpa++;
+          }
+        } else {
+          statAlpa++;
+        }
+
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${escapeHtml(guru.nama)}</strong></td>
+          <td>${guru.nip}</td>
+          <td>${jamMasuk}</td>
+          <td>${jamPulang}</td>
+          <td>${selfieBtn}</td>
+          <td><span class="badge ${badgeClass}">${escapeHtml(statusTxt)}</span></td>
+          <td>${escapeHtml(ket)}</td>
+          <td>
+            <button class="btn-secondary btn-sm" onclick="window.koreksiAbsenModal('${guru.nip}', '${todayStr}')"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+          </td>
+        `;
+        tbodyToday.appendChild(tr);
+      });
+
+      document.getElementById('stat-hadir').textContent = statHadir;
+      document.getElementById('stat-terlambat').textContent = statTerlambat;
+      document.getElementById('stat-izin').textContent = statIzin;
+      document.getElementById('stat-alpa').textContent = statAlpa;
+
+      renderPendingApprovals();
+    }
+
+    window.viewSelfieModal = function(base64Img, nama) {
+      const htmlImg = `<div style="text-align:center;"><img src="${base64Img}" style="max-width:100%; border-radius:8px; border:1px solid var(--border-color);" alt="Selfie"></div>`;
+      window.openModal(`Tangkapan Selfie Presensi - ${nama}`, htmlImg, null);
+    };
+
+    function renderPendingApprovals() {
+      const tbody = document.getElementById('table-admin-approval-body');
+      tbody.innerHTML = '';
+
+      const records = safeStorageGet(ABSENSI_KEY) || [];
+      const pendingList = records.filter(r => r.status && r.status.startsWith('[Menunggu]'));
+
+      if (pendingList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">Tidak ada pengajuan izin/sakit/cuti yang menunggu persetujuan.</td></tr>`;
+        return;
+      }
+
+      pendingList.forEach(rec => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${rec.tanggal}</strong></td>
+          <td>${escapeHtml(rec.nama)}</td>
+          <td>${rec.nip}</td>
+          <td><span class="badge badge-warning">${escapeHtml(rec.tipeIzin || 'Izin')}</span></td>
+          <td>${escapeHtml(rec.keterangan)}</td>
+          <td>
+            <button class="btn-emerald btn-sm" onclick="window.approveIzin('${rec.nip}', '${rec.tanggal}', true)"><i class="fa-solid fa-check"></i> Setujui</button>
+            <button class="btn-primary btn-sm" style="background-color: var(--danger-red);" onclick="window.approveIzin('${rec.nip}', '${rec.tanggal}', false)"><i class="fa-solid fa-xmark"></i> Tolak</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.approveIzin = function(nip, tanggal, isApproved) {
+      const records = safeStorageGet(ABSENSI_KEY) || [];
+      const targetIndex = records.findIndex(r => r.nip === nip && r.tanggal === tanggal);
+
+      if (targetIndex !== -1) {
+        const rec = records[targetIndex];
+        if (isApproved) {
+          rec.status = rec.tipeIzin || 'Izin';
+          rec.keterangan = `[Disetujui Admin] ${rec.keterangan}`;
+          addActivityLog("Approval Izin", `Persetujuan ${rec.tipeIzin} disetujui untuk ${rec.nama}`);
+          showToast("Pengajuan izin disetujui!", "success");
+        } else {
+          rec.status = 'Ditolak (Alpa)';
+          rec.keterangan = `[Ditolak Admin] ${rec.keterangan}`;
+          addActivityLog("Approval Izin", `Persetujuan ${rec.tipeIzin} ditolak untuk ${rec.nama}`);
+          showToast("Pengajuan izin ditolak.", "warning");
+        }
+        safeStorageSet(ABSENSI_KEY, records);
+        renderAdminDashboard();
+      }
+    };
+
+    window.koreksiAbsenModal = function(nip, tanggal) {
+      const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+      const records = safeStorageGet(ABSENSI_KEY) || [];
+      const guru = guruList.find(g => g.nip === nip);
+      const rec = records.find(r => r.nip === nip && r.tanggal === tanggal);
+
+      const statusOpt = ['Hadir', 'Terlambat', 'Izin', 'Sakit', 'Cuti', 'Alpa'];
+      let optionsHtml = statusOpt.map(s => `<option value="${s}" ${rec && rec.status.includes(s) ? 'selected' : ''}>${s}</option>`).join('');
+
+      const htmlForm = `
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div><strong>Guru:</strong> ${escapeHtml(guru ? guru.nama : nip)}</div>
+          <div><strong>Tanggal:</strong> ${tanggal}</div>
+          <div class="form-group">
+            <label>Status Kehadiran</label>
+            <select id="modal-edit-status" class="form-control">${optionsHtml}</select>
+          </div>
+          <div class="form-group">
+            <label>Keterangan Koreksi Admin</label>
+            <input type="text" id="modal-edit-ket" class="form-control" value="${rec ? escapeHtml(rec.keterangan) : 'Koreksi Manual Admin'}">
+          </div>
+        </div>
+      `;
+
+      window.openModal("Koreksi Presensi Manual", htmlForm, () => {
+        const newStatus = document.getElementById('modal-edit-status').value;
+        const newKet = document.getElementById('modal-edit-ket').value.trim();
+
+        let targetRec = records.find(r => r.nip === nip && r.tanggal === tanggal);
+        if (!targetRec) {
+          targetRec = {
+            nip,
+            nama: guru ? guru.nama : 'Guru',
+            tanggal,
+            jamMasuk: newStatus === 'Hadir' || newStatus === 'Terlambat' ? '07:00' : '-',
+            jamPulang: newStatus === 'Hadir' || newStatus === 'Terlambat' ? '13:30' : '-',
+            status: newStatus,
+            jarakMasuk: 0,
+            keterangan: newKet
+          };
+          records.push(targetRec);
+        } else {
+          targetRec.status = newStatus;
+          targetRec.keterangan = newKet;
+        }
+
+        safeStorageSet(ABSENSI_KEY, records);
+        addActivityLog("Koreksi Absen", `Koreksi status ${targetRec.nama} tanggal ${tanggal} menjadi ${newStatus}`);
+        showToast("Presensi berhasil dikoreksi!", "success");
+        renderAdminDashboard();
+      });
+    };
+
+    /* ==========================================================================
+       CRUD GURU LENGKAP & MANAJEMEN SANDI
+       ========================================================================== */
+    function renderAdminGuruTable() {
+      const tbody = document.getElementById('table-admin-guru-body');
+      tbody.innerHTML = '';
+
+      const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+      guruList.forEach((guru, idx) => {
+        const tr = document.createElement('tr');
+        const avatarSrc = guru.photoUrl || DEFAULT_LOGO;
+        const faceBadge = guru.isFaceRegistered ? '<span class="badge badge-success"><i class="fa-solid fa-face-smile"></i> Terdaftar</span>' : '<span class="badge badge-warning"><i class="fa-solid fa-face-frown"></i> Belum</span>';
+
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><img src="${avatarSrc}" class="img-avatar-sm" alt="Foto"></td>
+          <td><code>${guru.nip}</code></td>
+          <td><strong>${escapeHtml(guru.nama)}</strong></td>
+          <td>${escapeHtml(guru.mapel)}</td>
+          <td>
+            <button class="btn-secondary btn-sm" onclick="window.modalGantiSandiGuru('${guru.nip}')"><i class="fa-solid fa-key"></i> Sandi</button>
+          </td>
+          <td>${faceBadge}</td>
+          <td>
+            <button class="btn-primary btn-sm" onclick="window.openModalEditGuru('${guru.nip}')"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+            <button class="btn-primary btn-sm" style="background-color: var(--danger-red);" onclick="window.deleteGuruModal('${guru.nip}')"><i class="fa-solid fa-trash"></i> Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.openModalTambahGuru = function() {
+      const htmlForm = `
+        <form id="form-crud-guru" style="display:flex; flex-direction:column; gap:12px;">
+          <div class="form-group">
+            <label>NIP / NIK Guru (18 Digit Angka)</label>
+            <input type="text" id="crud-nip" class="form-control" maxlength="18" placeholder="Contoh: 198001012005011001" required>
+          </div>
+          <div class="form-group">
+            <label>Nama Lengkap (dengan Gelar)</label>
+            <input type="text" id="crud-nama" class="form-control" placeholder="Contoh: Drs. Ahmad Dahlan, M.Pd." required>
+          </div>
+          <div class="form-group">
+            <label>Mata Pelajaran Utama</label>
+            <input type="text" id="crud-mapel" class="form-control" placeholder="Contoh: Matematika" required>
+          </div>
+          <div class="form-group">
+            <label>Foto Profil Guru (Maks 160px JPG)</label>
+            <input type="file" id="crud-foto" accept="image/*" class="form-control" style="font-size: 12px;">
+          </div>
+        </form>
+      `;
+
+      window.openModal("Tambah Guru Baru", htmlForm, async () => {
+        const rawNip = document.getElementById('crud-nip').value.replace(/\D/g, '');
+        const nama = document.getElementById('crud-nama').value.trim();
+        const mapel = document.getElementById('crud-mapel').value.trim();
+        const fotoInput = document.getElementById('crud-foto');
+
+        if (rawNip.length !== 18) {
+          showToast("NIP harus persis 18 digit angka!", "error");
+          return;
+        }
+
+        const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+        if (guruList.some(g => g.nip === rawNip)) {
+          showToast("NIP tersebut sudah terdaftar!", "error");
+          return;
+        }
+
+        let photoUrl = '';
+        if (fotoInput.files && fotoInput.files[0]) {
+          photoUrl = await resizeImageToBase64(fotoInput.files[0], 160, 0.6);
+        }
+
+        const defaultHash = await hashText("123456");
+        guruList.push({
+          nip: rawNip,
+          nama,
+          mapel,
+          photoUrl,
+          passHash: defaultHash,
+          isDefaultPass: true,
+          isFaceRegistered: false,
+          faceDescriptor: null
+        });
+
+        safeStorageSet(GURU_LIST_KEY, guruList);
+        addActivityLog("Tambah Guru", `Menambahkan data guru baru: ${nama} (${rawNip})`);
+        showToast("Guru baru berhasil ditambahkan!", "success");
+        renderAdminGuruTable();
+      });
+    };
+
+    window.openModalEditGuru = function(nip) {
+      const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+      const guru = guruList.find(g => g.nip === nip);
+      if (!guru) return;
+
+      const htmlForm = `
+        <form style="display:flex; flex-direction:column; gap:12px;">
+          <div class="form-group">
+            <label>NIP / NIK (Tidak dapat diubah)</label>
+            <input type="text" class="form-control" value="${guru.nip}" disabled>
+          </div>
+          <div class="form-group">
+            <label>Nama Lengkap</label>
+            <input type="text" id="edit-nama" class="form-control" value="${escapeHtml(guru.nama)}" required>
+          </div>
+          <div class="form-group">
+            <label>Mata Pelajaran</label>
+            <input type="text" id="edit-mapel" class="form-control" value="${escapeHtml(guru.mapel)}" required>
+          </div>
+          <div class="form-group">
+            <label>Ganti Foto Profile Guru</label>
+            <input type="file" id="edit-foto" accept="image/*" class="form-control" style="font-size: 12px;">
+          </div>
+        </form>
+      `;
+
+      window.openModal("Edit Data Guru", htmlForm, async () => {
+        const nama = document.getElementById('edit-nama').value.trim();
+        const mapel = document.getElementById('edit-mapel').value.trim();
+        const fotoInput = document.getElementById('edit-foto');
+
+        guru.nama = nama;
+        guru.mapel = mapel;
+
+        if (fotoInput.files && fotoInput.files[0]) {
+          guru.photoUrl = await resizeImageToBase64(fotoInput.files[0], 160, 0.6);
+        }
+
+        safeStorageSet(GURU_LIST_KEY, guruList);
+        addActivityLog("Edit Guru", `Memperbarui data guru ${nama} (${nip})`);
+        showToast("Data guru berhasil diperbarui!", "success");
+        renderAdminGuruTable();
+      });
+    };
+
+    window.deleteGuruModal = function(nip) {
+      const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+      const guru = guruList.find(g => g.nip === nip);
+
+      window.openModal(
+        "Konfirmasi Hapus Guru",
+        `Apakah Anda yakin ingin menghapus data guru ${guru ? guru.nama : nip}? Seluruh data profil dan akses login akan dihapus.`,
+        () => {
+          const filtered = guruList.filter(g => g.nip !== nip);
+          safeStorageSet(GURU_LIST_KEY, filtered);
+          addActivityLog("Hapus Guru", `Menghapus data guru ${guru ? guru.nama : nip}`);
+          showToast("Data guru telah dihapus.", "success");
+          renderAdminGuruTable();
+        }
+      );
+    };
+
+    window.modalGantiSandiGuru = function(nip) {
+      const htmlForm = `
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div class="form-group">
+            <label>Sandi Baru (Min 4 Karakter)</label>
+            <input type="text" id="pass-guru-new" class="form-control" placeholder="Masukkan sandi baru..." required>
+          </div>
+          <button type="button" class="btn-secondary btn-sm" onclick="document.getElementById('pass-guru-new').value = Math.random().toString(36).slice(-6);"><i class="fa-solid fa-wand-magic-sparkles"></i> Buat Sandi Acak</button>
+        </div>
+      `;
+
+      window.openModal("Ganti Sandi Guru", htmlForm, async () => {
+        const newPass = document.getElementById('pass-guru-new').value.trim();
+        if (newPass.length < 4) {
+          showToast("Sandi minimal 4 karakter!", "error");
+          return;
+        }
+
+        const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+        const guru = guruList.find(g => g.nip === nip);
+        if (guru) {
+          guru.passHash = await hashText(newPass);
+          guru.isDefaultPass = false;
+          safeStorageSet(GURU_LIST_KEY, guruList);
+          addActivityLog("Ganti Sandi Guru", `Mengubah kata sandi untuk guru ${guru.nama}`);
+          showToast(`Sandi guru ${guru.nama} berhasil diperbarui!`, "success");
+          renderAdminGuruTable();
+        }
+      });
+    };
+
+    function resizeImageToBase64(file, maxDimension = 200, quality = 0.6) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > maxDimension) {
+                height *= maxDimension / width;
+                width = maxDimension;
+              }
+            } else {
+              if (height > maxDimension) {
+                width *= maxDimension / height;
+                height = maxDimension;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    /* ==========================================================================
+       LOG AKTIVITAS TABEL
+       ========================================================================== */
+    function renderAdminLogsTable() {
+      const tbody = document.getElementById('table-admin-logs-body');
+      tbody.innerHTML = '';
+
+      const logs = safeStorageGet(LOG_KEY) || [];
+      if (logs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">Belum ada catatan aktivitas sistem.</td></tr>`;
+        return;
+      }
+
+      logs.forEach(log => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><small style="color: var(--text-muted);">${log.waktu}</small></td>
+          <td><strong>${escapeHtml(log.actor)}</strong></td>
+          <td><span class="badge badge-info">${escapeHtml(log.action)}</span></td>
+          <td>${escapeHtml(log.detail)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.clearActivityLogs = function() {
+      window.openModal("Bersihkan Log Aktivitas", "Apakah Anda yakin ingin menghapus seluruh catatan aktivitas sistem?", () => {
+        safeStorageSet(LOG_KEY, []);
+        showToast("Log aktivitas dibersihkan.", "success");
+        renderAdminLogsTable();
+      });
+    };
+
+    /* ==========================================================================
+       REKAP BULANAN & EKSPOR DOKUMEN (PDF, EXCEL, CSV)
+       ========================================================================== */
+    function renderAdminRekapBulanan() {
+      const bulan = parseInt(document.getElementById('rekap-bulan').value, 10);
+      const tahun = parseInt(document.getElementById('rekap-tahun').value, 10);
+
+      const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+      const records = safeStorageGet(ABSENSI_KEY) || [];
+      const cfg = safeStorageGet(APP_CONFIG_KEY) || INITIAL_CONFIG;
+
+      const now = new Date();
+      const isCurrentMonth = (now.getMonth() + 1 === bulan && now.getFullYear() === tahun);
+      const totalDaysInMonth = new Date(tahun, bulan, 0).getDate();
+
+      let hariKerjaEfektif = 0;
+      const limitDay = isCurrentMonth ? now.getDate() : totalDaysInMonth;
+
+      for (let d = 1; d <= limitDay; d++) {
+        const curDate = new Date(tahun, bulan - 1, d);
+        if (curDate.getDay() !== 0) {
+          if (isCurrentMonth && d === now.getDate()) {
+            const jamNow = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            if (jamNow >= cfg.jamPulang) hariKerjaEfektif++;
+          } else {
+            hariKerjaEfektif++;
+          }
+        }
+      }
+
+      document.getElementById('rekap-stat-total-guru').textContent = guruList.length;
+      document.getElementById('rekap-stat-efektif').textContent = `${hariKerjaEfektif} Hari`;
+
+      const rekapData = [];
+      let grandTotalHadir = 0, grandTotalTerlambat = 0, grandTotalIzin = 0, grandTotalSakit = 0, grandTotalCuti = 0, grandTotalAlpa = 0;
+      let highestPct = -1, bestGuruName = '-';
+
+      guruList.forEach(guru => {
+        let hadir = 0, terlambat = 0, izin = 0, sakit = 0, cuti = 0, alpa = 0;
+
+        records.forEach(r => {
+          if (r.nip === guru.nip) {
+            const rDate = new Date(r.tanggal);
+            if (rDate.getMonth() + 1 === bulan && rDate.getFullYear() === tahun) {
+              if (r.status.startsWith('Hadir')) hadir++;
+              else if (r.status.startsWith('Terlambat')) terlambat++;
+              else if (r.status === 'Izin') izin++;
+              else if (r.status === 'Sakit') sakit++;
+              else if (r.status === 'Cuti') cuti++;
+            }
+          }
+        });
+
+        const totalCatat = hadir + terlambat + izin + sakit + cuti;
+        alpa = Math.max(0, hariKerjaEfektif - totalCatat);
+        const pct = hariKerjaEfektif > 0 ? Math.min(100, Math.round(((hadir + terlambat) / hariKerjaEfektif) * 100)) : 0;
+
+        if (pct > highestPct) {
+          highestPct = pct;
+          bestGuruName = guru.nama;
+        }
+
+        grandTotalHadir += hadir; grandTotalTerlambat += terlambat; grandTotalIzin += izin;
+        grandTotalSakit += sakit; grandTotalCuti += cuti; grandTotalAlpa += alpa;
+
+        rekapData.push({ nama: guru.nama, nip: guru.nip, hadir, terlambat, izin, sakit, cuti, alpa, pct });
+      });
+
+      document.getElementById('rekap-stat-disiplin').textContent = bestGuruName;
+
+      const tbody = document.getElementById('table-rekap-bulanan-body');
+      tbody.innerHTML = '';
+
+      rekapData.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${escapeHtml(row.nama)}</strong></td>
+          <td>${row.nip}</td>
+          <td>${row.hadir}</td>
+          <td>${row.terlambat}</td>
+          <td>${row.izin}</td>
+          <td>${row.sakit}</td>
+          <td>${row.cuti}</td>
+          <td style="color: var(--danger-red); font-weight: 600;">${row.alpa}</td>
+          <td><strong>${row.pct}%</strong></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const totalPctSum = rekapData.reduce((acc, curr) => acc + curr.pct, 0);
+      const avgPct = rekapData.length > 0 ? Math.round(totalPctSum / rekapData.length) : 0;
+      document.getElementById('rekap-stat-rata').textContent = `${avgPct}%`;
+
+      renderRekapCharts(rekapData, { grandTotalHadir, grandTotalTerlambat, grandTotalIzin, grandTotalSakit, grandTotalCuti, grandTotalAlpa });
+    }
+
+    function renderRekapCharts(rekapData, totals) {
+      if (!window.Chart) return;
+
+      if (chartBarInstance) chartBarInstance.destroy();
+      if (chartDonutInstance) chartDonutInstance.destroy();
+
+      const ctxBar = document.getElementById('chartBarKehadiran').getContext('2d');
+      chartBarInstance = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+          labels: rekapData.map(g => g.nama.split(',')[0]),
+          datasets: [{ label: '% Kehadiran', data: rekapData.map(g => g.pct), backgroundColor: '#10B981', borderRadius: 4 }]
+        },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { min: 0, max: 100 } } }
+      });
+
+      const ctxDonut = document.getElementById('chartDonutKomposisi').getContext('2d');
+      chartDonutInstance = new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+          labels: ['Hadir', 'Terlambat', 'Izin', 'Sakit', 'Cuti', 'Alpa'],
+          datasets: [{ data: [totals.grandTotalHadir, totals.grandTotalTerlambat, totals.grandTotalIzin, totals.grandTotalSakit, totals.grandTotalCuti, totals.grandTotalAlpa], backgroundColor: ['#10B981', '#F59E0B', '#3B82F6', '#6366F1', '#8B5CF6', '#EF4444'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+
+    window.exportRekapPDF = function() {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        showToast("Library jsPDF belum siap. Mohon periksa koneksi CDN.", "error");
+        return;
+      }
+
+      const cfg = safeStorageGet(APP_CONFIG_KEY) || INITIAL_CONFIG;
+      const bulanNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      const bulanIdx = parseInt(document.getElementById('rekap-bulan').value, 10);
+      const bulanStr = bulanNames[bulanIdx - 1];
+      const tahunStr = document.getElementById('rekap-tahun').value;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text(cfg.agencyName.toUpperCase(), 148, 14, { align: "center" });
+      doc.setFontSize(16);
+      doc.text(cfg.schoolName.toUpperCase(), 148, 22, { align: "center" });
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text("Kecamatan Tinggimoncong, Kabupaten Gowa - Sulawesi Selatan", 148, 28, { align: "center" });
+
+      doc.setLineWidth(0.8);
+      doc.line(14, 32, 283, 32);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text(`REKAPITULASI KEHADIRAN GURU - BULAN ${bulanStr.toUpperCase()} ${tahunStr}`, 148, 40, { align: "center" });
+
+      const tableRows = [];
+      const trs = document.querySelectorAll('#table-rekap-bulanan-body tr');
+      trs.forEach(tr => {
+        const rowData = [];
+        tr.querySelectorAll('td').forEach(td => rowData.push(td.textContent.trim()));
+        tableRows.push(rowData);
+      });
+
+      doc.autoTable({
+        startY: 46,
+        head: [['No', 'Nama Guru', 'NIP', 'Hadir', 'Terlambat', 'Izin', 'Sakit', 'Cuti', 'Alpa', '% Kehadiran']],
+        body: tableRows,
+        theme: 'grid',
+        headStyles: { fillColor: [30, 58, 138], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
+        styles: { fontSize: 9, cellPadding: 2 },
+        columnStyles: {
+          0: { halign: 'center', cellWidth: 10 },
+          1: { cellWidth: 60 },
+          2: { cellWidth: 45 },
+          3: { halign: 'center' }, 4: { halign: 'center' }, 5: { halign: 'center' },
+          6: { halign: 'center' }, 7: { halign: 'center' }, 8: { halign: 'center' },
+          9: { halign: 'center', fontStyle: 'bold' }
+        }
+      });
+
+      const finalY = doc.lastAutoTable.finalY + 12;
+      const todayStr = `${new Date().getDate()} ${bulanNames[new Date().getMonth()]} ${new Date().getFullYear()}`;
+
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Tinggimoncong, ${todayStr}`, 210, finalY);
+      doc.text("Kepala SMPN 4 Tinggimoncong,", 210, finalY + 6);
+
+      doc.setFont("helvetica", "bold");
+      doc.text(cfg.kepsekNama, 210, finalY + 26);
+      doc.setFont("helvetica", "normal");
+      doc.text(`NIP. ${cfg.kepsekNip}`, 210, finalY + 31);
+
+      doc.save(`Rekap_Absensi_SMPN4Tinggimoncong_${bulanIdx}_${tahunStr}.pdf`);
+      addActivityLog("Export PDF", `Mengunduh Rekap PDF Bulan ${bulanStr} ${tahunStr}`);
+      showToast("Laporan PDF berhasil diunduh!", "success");
+    };
+
+    window.exportRekapExcel = function() {
+      if (!window.XLSX) {
+        showToast("Library SheetJS belum siap.", "error");
+        return;
+      }
+
+      const bulan = document.getElementById('rekap-bulan').value;
+      const tahun = document.getElementById('rekap-tahun').value;
+      const table = document.querySelector('#view-admin-rekap table');
+
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Rekap Kehadiran" });
+      XLSX.writeFile(wb, `Rekap_Absensi_SMPN4Tinggimoncong_${bulan}_${tahun}.xlsx`);
+
+      addActivityLog("Export Excel", `Mengunduh Rekap Excel Bulan ${bulan} ${tahun}`);
+      showToast("File Excel (.xlsx) berhasil diunduh!", "success");
+    };
+
+    window.exportRekapCSV = function() {
+      const bulan = document.getElementById('rekap-bulan').value;
+      const tahun = document.getElementById('rekap-tahun').value;
+
+      const guruList = safeStorageGet(GURU_LIST_KEY) || [];
+      const records = safeStorageGet(ABSENSI_KEY) || [];
+
+      let csvContent = "\uFEFF";
+      csvContent += "No,Nama Guru,NIP,Hadir,Terlambat,Izin,Sakit,Cuti,Alpa,% Kehadiran\n";
+
+      guruList.forEach((guru, idx) => {
+        let hadir = 0, terlambat = 0, izin = 0, sakit = 0, cuti = 0, alpa = 0;
+        records.forEach(r => {
+          if (r.nip === guru.nip) {
+            const rDate = new Date(r.tanggal);
+            if (rDate.getMonth() + 1 === parseInt(bulan) && rDate.getFullYear() === parseInt(tahun)) {
+              if (r.status.startsWith('Hadir')) hadir++;
+              else if (r.status.startsWith('Terlambat')) terlambat++;
+              else if (r.status === 'Izin') izin++;
+              else if (r.status === 'Sakit') sakit++;
+              else if (r.status === 'Cuti') cuti++;
+            }
+          }
+        });
+
+        const pctText = `${document.querySelectorAll('#table-rekap-bulanan-body tr')[idx]?.children[9]?.textContent || '0%'}`;
+        const cleanName = guru.nama.replace(/,/g, ' ');
+        csvContent += `${idx + 1},"${cleanName}",'${guru.nip},${hadir},${terlambat},${izin},${sakit},${cuti},${alpa},"${pctText}"\n`;
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', `Rekap_Absensi_SMPN4Tinggimoncong_${bulan}_${tahun}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      addActivityLog("Export CSV", `Mengunduh Rekap CSV Bulan ${bulan} ${tahun}`);
+      showToast("File CSV Rekapitulasi berhasil diunduh!", "success");
+    };
+
+    /* ==========================================================================
+       RENDERING GURU & RIWAYAT
+       ========================================================================== */
+    function renderGuruRiwayat() {
+      const tbody = document.getElementById('table-riwayat-guru-body');
+      tbody.innerHTML = '';
+
+      const records = safeStorageGet(ABSENSI_KEY) || [];
+      const myRecords = records.filter(r => r.nip === currentSession.nip);
+
+      const list7Days = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        list7Days.push(tanggalLokal(d));
+      }
+
+      list7Days.forEach(tgl => {
+        const rec = myRecords.find(r => r.tanggal === tgl);
+        const tr = document.createElement('tr');
+
+        if (rec) {
+          let badgeClass = 'badge-success';
+          if (rec.status.includes('Terlambat') || rec.status.includes('Menunggu')) badgeClass = 'badge-warning';
+          if (['Izin', 'Sakit', 'Cuti'].includes(rec.status)) badgeClass = 'badge-info';
+
+          const selfieBtn = rec.fotoSelfie ? `<button class="btn-secondary btn-sm" onclick="window.viewSelfieModal('${rec.fotoSelfie}', '${rec.nama}')"><i class="fa-solid fa-image"></i></button>` : '-';
+
+          tr.innerHTML = `
+            <td><strong>${rec.tanggal}</strong></td>
+            <td>${rec.jamMasuk || '-'}</td>
+            <td>${rec.jamPulang || '-'}</td>
+            <td>${rec.jarakMasuk ? rec.jarakMasuk + 'm' : '-'}</td>
+            <td>${selfieBtn}</td>
+            <td><span class="badge ${badgeClass}">${escapeHtml(rec.status)}</span></td>
+            <td>${escapeHtml(rec.keterangan || '-')}</td>
+          `;
+        } else {
+          tr.innerHTML = `
+            <td><strong>${tgl}</strong></td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td><span class="badge badge-danger">Tanpa Keterangan / Alpa</span></td>
+            <td>-</td>
+          `;
+        }
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* ==========================================================================
+       PENGATURAN, UPLOAD LOGO & BACKUP / RESTORE JSON
+       ========================================================================== */
+    window.handleLogoUpload = async function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const logoDataUrl = await resizeImageToBase64(file, 256, 0.8);
+        document.getElementById('cfg-logo-preview').src = logoDataUrl;
+      }
+    };
+
+    window.saveSettings = async function(e) {
+      e.preventDefault();
+      const cfg = safeStorageGet(APP_CONFIG_KEY) || INITIAL_CONFIG;
+
+      cfg.schoolName = document.getElementById('cfg-school-name').value.trim();
+      cfg.agencyName = document.getElementById('cfg-agency-name').value.trim();
+      cfg.lat = parseFloat(document.getElementById('cfg-lat').value);
+      cfg.lng = parseFloat(document.getElementById('cfg-lng').value);
+      cfg.radiusMeter = parseInt(document.getElementById('cfg-radius').value, 10);
+      cfg.kepsekNama = document.getElementById('cfg-kepsek-nama').value.trim();
+      cfg.kepsekNip = document.getElementById('cfg-kepsek-nip').value.trim();
+      cfg.modeVerifikasi = document.getElementById('cfg-mode-verifikasi').value;
+      cfg.faceThreshold = parseFloat(document.getElementById('cfg-face-threshold').value);
+
+      const logoPreview = document.getElementById('cfg-logo-preview').src;
+      if (logoPreview) cfg.logoDataUrl = logoPreview;
+
+      const newAdminUser = document.getElementById('cfg-admin-user').value.trim();
+      const newAdminPass = document.getElementById('cfg-admin-pass').value.trim();
+
+      if (newAdminUser) cfg.adminUsername = newAdminUser;
+      if (newAdminPass) {
+        cfg.adminPassHash = await hashText(newAdminPass, cfg.adminSalt);
+      }
+
+      safeStorageSet(APP_CONFIG_KEY, cfg);
+      applyConfigToUI(cfg);
+      addActivityLog("Pengaturan", "Memperbarui konfigurasi sistem, kamera, dan lokasi sekolah");
+      showToast("Pengaturan berhasil disimpan!", "success");
+    };
+
+    window.downloadBackupJSON = function() {
+      const backupData = {
+        config: safeStorageGet(APP_CONFIG_KEY),
+        guruList: safeStorageGet(GURU_LIST_KEY),
+        absensi: safeStorageGet(ABSENSI_KEY),
+        logs: safeStorageGet(LOG_KEY),
+        exportedAt: new Date().toISOString()
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `Backup_Absensi_SMPN4Tinggimoncong_${tanggalLokal()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      addActivityLog("Backup Data", "Mengunduh file backup database JSON");
+      showToast("File backup JSON berhasil diunduh!", "success");
+    };
+
+    window.handleRestoreJSON = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          if (parsed.config && parsed.guruList && parsed.absensi) {
+            safeStorageSet(APP_CONFIG_KEY, parsed.config);
+            safeStorageSet(GURU_LIST_KEY, parsed.guruList);
+            safeStorageSet(ABSENSI_KEY, parsed.absensi);
+            if (parsed.logs) safeStorageSet(LOG_KEY, parsed.logs);
+
+            addActivityLog("Restore Data", "Memulihkan data sistem dari file backup JSON");
+            showToast("Restore database berhasil! Halaman dimuat ulang.", "success");
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            showToast("Struktur file JSON backup tidak valid!", "error");
+          }
+        } catch (err) {
+          showToast("Gagal membaca file JSON!", "error");
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    window.resetSampleDataModal = function() {
+      window.openModal("Muat Ulang Data Contoh", "Aksi ini akan mereset daftar guru dan konfigurasi ke data contoh bawaan awal.", async () => {
+        const defaultHash = await hashText("123456");
+        const freshGuru = INITIAL_GURU_LIST.map(g => ({ ...g, passHash: defaultHash }));
+        safeStorageSet(GURU_LIST_KEY, freshGuru);
+        safeStorageSet(APP_CONFIG_KEY, INITIAL_CONFIG);
+        addActivityLog("Reset Data", "Mereset daftar guru dan sistem ke data contoh");
+        showToast("Data contoh berhasil dimuat ulang!", "success");
+        setTimeout(() => window.location.reload(), 1200);
+      });
+    };
+
+    window.clearAllAbsensiModal = function() {
+      window.openModal("Hapus Semua Presensi", "PERINGATAN: Seluruh riwayat absensi guru akan dihapus permanen dari perangkat ini!", () => {
+        safeStorageSet(ABSENSI_KEY, []);
+        addActivityLog("Hapus Data", "Menghapus seluruh riwayat presensi guru");
+        showToast("Seluruh data presensi telah dibersihkan.", "success");
+        renderAdminDashboard();
+      });
+    };
+
+    window.deleteMyData = function() {
+      window.openModal(
+        "Hapus Data Presensi Saya",
+        "Apakah Anda yakin ingin menghapus seluruh riwayat presensi lokal Anda dari perangkat ini?",
+        () => {
+          const records = safeStorageGet(ABSENSI_KEY) || [];
+          const filtered = records.filter(r => r.nip !== currentSession.nip);
+          safeStorageSet(ABSENSI_KEY, filtered);
+          addActivityLog("Right to Forgotten", `Guru ${currentSession.nama} menghapus data presensi pribadinya`);
+          showToast("Seluruh data presensi Anda telah dihapus.", "success");
+          window.switchGuruTab('riwayat');
+        }
+      );
+    };
+
+    /* ==========================================================================
+       MODAL UTAMA KUSTOM
+       ========================================================================== */
+    window.openModal = function(title, textOrHtml, onConfirm) {
+      document.getElementById('modal-title').textContent = title;
+      const bodyEl = document.getElementById('modal-body');
+      if (typeof textOrHtml === 'string' && textOrHtml.trim().startsWith('<')) {
+        bodyEl.innerHTML = textOrHtml;
+      } else {
+        bodyEl.textContent = textOrHtml;
+      }
+      pendingModalCallback = onConfirm;
+      document.getElementById('custom-modal').classList.add('active');
+    };
+
+    window.closeModal = function() {
+      stopCameraStream();
+      document.getElementById('custom-modal').classList.remove('active');
+      pendingModalCallback = null;
+    };
+
+    window.executeModalAction = function() {
+      if (pendingModalCallback) pendingModalCallback();
+      window.closeModal();
+    };
+
+    document.getElementById('custom-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'custom-modal') window.closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') window.closeModal();
+    });
+
+    // Inisialisasi awal aplikasi
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
+```
