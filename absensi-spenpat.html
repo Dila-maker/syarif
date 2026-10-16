@@ -90,7 +90,7 @@
 
     .input-password-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
     .input-password-wrapper .form-control { padding-right: 42px; }
-    .btn-toggle-password { position: absolute; right: 10px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; padding: 6px; display: flex; align-items: center; justify-content: center; }
+    .btn-toggle-password { position: absolute; right: 10px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; padding: 6px; display: flex; align-items: center; justify-content: center; z-index: 5; }
     .btn-toggle-password:hover { color: var(--primary-blue); }
 
     .btn-primary { background-color: var(--primary-blue); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
@@ -215,7 +215,7 @@
         <button type="submit" class="btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Masuk Guru</button>
 
         <div id="guru-demo-info" class="demo-info-box">
-          <strong><i class="fa-solid fa-circle-info"></i> Contoh NIP / NIPGTT Guru:</strong><br>
+          <strong><i class="fa-solid fa-circle-info"></i> Contoh NIP / NIPGTT Guru Resmi:</strong><br>
           • <code>196907271995031003</code> (Syafruddin, S.Pd., M.Si.)<br>
           • <code>197106252010012004</code> (Nurjannah, S.Pd.)<br>
           • <code>198905110001</code> (Nawir, S.Pd., Gr.)<br>
@@ -360,17 +360,14 @@
           <div style="display: flex; flex-direction: column; gap: 4px;">
             <div><strong id="prof-nama" style="font-size: 16px;">-</strong></div>
             <div style="font-size: 13px; color: var(--text-muted);">NIP / NIPGTT: <span id="prof-nip">-</span></div>
-            <div style="font-size: 13px; color: var(--text-muted);">Mapel: <span id="prof-mapel">-</span></div>
-            <div style="font-size: 12px; margin-top: 4px;">
-              Status Biometrik Wajah: <span id="prof-face-status" class="badge badge-warning">Belum Terdaftar</span>
-            </div>
+            <div style="font-size: 13px; color: var(--text-muted);">Status Biometrik Wajah: <span id="prof-face-status" class="badge badge-warning">Belum Terdaftar</span></div>
           </div>
         </div>
 
         <div style="border-top: 1px solid var(--border-color); padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
           <h4 style="font-size: 14px; color: var(--primary-blue);"><i class="fa-solid fa-face-smile"></i> Pendaftaran Biometrik Wajah</h4>
           <p style="font-size: 12px; color: var(--text-muted);">
-            Daftarkan 3 sampel koordinat biometrik wajah Anda untuk verifikasi presensi instan.
+            Daftarkan sampel koordinat biometrik wajah Anda untuk verifikasi presensi instan.
           </p>
           <div style="display: flex; gap: 10px;">
             <button class="btn-emerald btn-sm" onclick="window.startFaceRegistrationFlow()"><i class="fa-solid fa-id-badge"></i> Daftar Wajah Saya</button>
@@ -570,7 +567,6 @@
                 <th>Foto</th>
                 <th>NIP / NIPGTT</th>
                 <th>Nama Guru</th>
-                <th>Mata Pelajaran</th>
                 <th>Sandi</th>
                 <th>Biometrik Wajah</th>
                 <th>Aksi</th>
@@ -725,7 +721,7 @@
         </div>
 
         <div style="border-top: 1px solid var(--border-color); margin-top: 16px; padding-top: 16px; display: flex; gap: 12px; justify-content: flex-end;">
-          <button class="btn-secondary btn-sm" onclick="window.resetSampleDataModal()"><i class="fa-solid fa-rotate-left"></i> Muat Data Contoh</button>
+          <button class="btn-secondary btn-sm" onclick="window.resetSampleDataModal()"><i class="fa-solid fa-rotate-left"></i> Muat Data Contoh Resmi</button>
           <button class="btn-primary btn-sm" style="background-color: var(--danger-red);" onclick="window.clearAllAbsensiModal()"><i class="fa-solid fa-dumpster"></i> Hapus Semua Presensi</button>
         </div>
       </div>
@@ -789,17 +785,17 @@
       faceThreshold: 0.55
     };
 
-    // Daftar Resmi Guru SMPN 4 Tinggimoncong
+    // Daftar Resmi 9 Guru SMPN 4 Tinggimoncong Sesuai Permintaan
     const INITIAL_GURU_LIST = [
-      { nip: "196907271995031003", nama: "Syafruddin, S.Pd., M.Si.", mapel: "Kepala Sekolah / IPA", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "197106252010012004", nama: "Nurjannah, S.Pd.", mapel: "Bahasa Indonesia", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "198905110001", nama: "Nawir, S.Pd., Gr.", mapel: "Matematika", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "200011120002", nama: "St. Ulil Asmi, S.Pd., Gr.", mapel: "Bahasa Inggris", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "198710020003", nama: "Satriani, S.Pd., Gr.", mapel: "IPA", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "199906070004", nama: "Nurmiati, S.Pd., Gr.", mapel: "IPS", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "200002080005", nama: "Ibnu Nandar Almudatsir, S.Pd.", mapel: "PJOK", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "200007110006", nama: "Nur Indah Sari, S.Pd.", mapel: "Informatika", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "200901010007", nama: "Satriani, A.Ma.", mapel: "Seni Budaya & Mulok", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null }
+      { nip: "196907271995031003", nama: "Syafruddin, S.Pd., M.Si.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "197106252010012004", nama: "Nurjannah, S.Pd.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "198905110001", nama: "Nawir, S.Pd., Gr.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200011120002", nama: "St. Ulil Asmi, S.Pd., Gr.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "198710020003", nama: "Satriani, S.Pd., Gr.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "199906070004", nama: "Nurmiati, S.Pd., Gr.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200002080005", nama: "Ibnu Nandar Almudatsir, S.Pd.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200007110006", nama: "Nur Indah Sari, S.Pd.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200901010007", nama: "Satriani, A.Ma.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null }
     ];
 
     /* ==========================================================================
@@ -924,7 +920,7 @@
       safeStorageSet(LOG_KEY, logs);
     }
 
-    /* FITUR TOGGLE PERLIHATKAN/SEMBUNYIKAN KATASANDI */
+    /* FITUR TOGGLE PERLIHATKAN/SEMBUNYIKAN KATA SANDI */
     window.togglePasswordVisibility = function(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
@@ -963,13 +959,25 @@
       applyConfigToUI(appConfig);
 
       let guruList = safeStorageGet(GURU_LIST_KEY);
+      const defaultHash = await hashText("123456");
+
       if (!guruList || guruList.length === 0) {
-        const defaultHash = await hashText("123456");
         guruList = INITIAL_GURU_LIST.map(g => ({
           ...g,
           passHash: defaultHash
         }));
         safeStorageSet(GURU_LIST_KEY, guruList);
+      } else {
+        // Pastikan setiap guru memiliki passHash valid
+        let updated = false;
+        guruList = guruList.map(g => {
+          if (!g.passHash) {
+            updated = true;
+            return { ...g, passHash: defaultHash };
+          }
+          return g;
+        });
+        if (updated) safeStorageSet(GURU_LIST_KEY, guruList);
       }
 
       populateRekapTahunDropdown();
@@ -1049,7 +1057,7 @@
       const guruList = safeStorageGet(GURU_LIST_KEY) || [];
       const inputHash = await hashText(pass);
 
-      const targetGuru = guruList.find(g => g.nip === cleanNip && g.passHash === inputHash);
+      const targetGuru = guruList.find(g => String(g.nip).replace(/\D/g, '') === cleanNip && g.passHash === inputHash);
 
       if (targetGuru) {
         const sessionToken = crypto.randomUUID();
@@ -1058,7 +1066,6 @@
           role: 'guru',
           nip: targetGuru.nip,
           nama: targetGuru.nama,
-          mapel: targetGuru.mapel,
           photoUrl: targetGuru.photoUrl || '',
           expiresAt: Date.now() + (8 * 60 * 60 * 1000)
         };
@@ -1672,11 +1679,11 @@
             <div class="camera-overlay"></div>
             <div id="scan-status" class="camera-status-text">Posisikan Wajah Tegak Lurus...</div>
           </div>
-          <p id="scan-instruction" style="font-size:12px; font-weight:600; color:var(--primary-blue);">Sampel 1 dari 3: Tatap Lurus Kamera</p>
+          <p id="scan-instruction" style="font-size:12px; font-weight:600; color:var(--primary-blue);">Tatap Lurus Kamera</p>
         </div>
       `;
 
-      window.openModal("Scan Biometrik Wajah (3 Sampel)", scanModalHtml, async () => {
+      window.openModal("Scan Biometrik Wajah", scanModalHtml, async () => {
         const videoEl = document.getElementById('scan-cam-video');
         if (!videoEl) return;
 
@@ -1742,7 +1749,6 @@
     function renderGuruProfil() {
       document.getElementById('prof-nama').textContent = currentSession.nama;
       document.getElementById('prof-nip').textContent = currentSession.nip;
-      document.getElementById('prof-mapel').textContent = currentSession.mapel;
       document.getElementById('prof-img-avatar').src = currentSession.photoUrl || DEFAULT_LOGO;
 
       const guruList = safeStorageGet(GURU_LIST_KEY) || [];
@@ -2009,7 +2015,6 @@
           <td><img src="${avatarSrc}" class="img-avatar-sm" alt="Foto"></td>
           <td><code>${guru.nip}</code></td>
           <td><strong>${escapeHtml(guru.nama)}</strong></td>
-          <td>${escapeHtml(guru.mapel)}</td>
           <td>
             <button class="btn-secondary btn-sm" onclick="window.modalGantiSandiGuru('${guru.nip}')"><i class="fa-solid fa-key"></i> Sandi</button>
           </td>
@@ -2035,10 +2040,6 @@
             <input type="text" id="crud-nama" class="form-control" placeholder="Contoh: Syafruddin, S.Pd., M.Si." required>
           </div>
           <div class="form-group">
-            <label>Mata Pelajaran Utama</label>
-            <input type="text" id="crud-mapel" class="form-control" placeholder="Contoh: Matematika" required>
-          </div>
-          <div class="form-group">
             <label>Foto Profil Guru (Maks 160px JPG)</label>
             <input type="file" id="crud-foto" accept="image/*" class="form-control" style="font-size: 12px;">
           </div>
@@ -2046,18 +2047,17 @@
       `;
 
       window.openModal("Tambah Guru Baru", htmlForm, async () => {
-        const rawNip = document.getElementById('crud-nip').value.replace(/\D/g, '');
+        const rawNip = document.getElementById('crud-nip').value.trim();
         const nama = document.getElementById('crud-nama').value.trim();
-        const mapel = document.getElementById('crud-mapel').value.trim();
         const fotoInput = document.getElementById('crud-foto');
 
-        if (rawNip.length < 8 || rawNip.length > 18) {
-          showToast("NIP / NIPGTT harus terdiri dari 8 hingga 18 digit angka!", "error");
+        if (!rawNip || !nama) {
+          showToast("NIP dan Nama Guru wajib diisi!", "error");
           return;
         }
 
         const guruList = safeStorageGet(GURU_LIST_KEY) || [];
-        if (guruList.some(g => g.nip === rawNip)) {
+        if (guruList.some(g => String(g.nip).replace(/\D/g, '') === rawNip.replace(/\D/g, ''))) {
           showToast("NIP / NIPGTT tersebut sudah terdaftar!", "error");
           return;
         }
@@ -2071,7 +2071,6 @@
         guruList.push({
           nip: rawNip,
           nama,
-          mapel,
           photoUrl,
           passHash: defaultHash,
           isDefaultPass: true,
@@ -2102,10 +2101,6 @@
             <input type="text" id="edit-nama" class="form-control" value="${escapeHtml(guru.nama)}" required>
           </div>
           <div class="form-group">
-            <label>Mata Pelajaran</label>
-            <input type="text" id="edit-mapel" class="form-control" value="${escapeHtml(guru.mapel)}" required>
-          </div>
-          <div class="form-group">
             <label>Ganti Foto Profile Guru</label>
             <input type="file" id="edit-foto" accept="image/*" class="form-control" style="font-size: 12px;">
           </div>
@@ -2114,11 +2109,9 @@
 
       window.openModal("Edit Data Guru", htmlForm, async () => {
         const nama = document.getElementById('edit-nama').value.trim();
-        const mapel = document.getElementById('edit-mapel').value.trim();
         const fotoInput = document.getElementById('edit-foto');
 
         guru.nama = nama;
-        guru.mapel = mapel;
 
         if (fotoInput.files && fotoInput.files[0]) {
           guru.photoUrl = await resizeImageToBase64(fotoInput.files[0], 160, 0.6);
@@ -2651,7 +2644,7 @@
     };
 
     window.resetSampleDataModal = function() {
-      window.openModal("Muat Ulang Data Resmi Guru", "Aksi ini akan mereset daftar guru ke data resmi SMPN 4 Tinggimoncong dan mengembalikan konfigurasi awal.", async () => {
+      window.openModal("Muat Ulang Data Resmi Guru", "Aksi ini akan mereset daftar guru ke data resmi 9 Guru SMPN 4 Tinggimoncong.", async () => {
         const defaultHash = await hashText("123456");
         const freshGuru = INITIAL_GURU_LIST.map(g => ({ ...g, passHash: defaultHash }));
         
