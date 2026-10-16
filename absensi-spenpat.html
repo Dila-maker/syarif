@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Absensi Guru SMPN 4 Tinggimoncong - Fase 4 (Lengkap & Terperbaiki)</title>
+  <title>Absensi Guru SMPN 4 Tinggimoncong - Versi Release Resmi</title>
   
   <!-- Google Fonts: Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,8 +58,6 @@
 
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-    .demo-banner { background-color: #FEF3C7; color: #92400E; font-size: 13px; text-align: center; padding: 6px 12px; border-bottom: 1px solid #FDE68A; font-weight: 500; }
-
     header { background: linear-gradient(135deg, var(--primary-blue) 0%, #1D4ED8 60%, var(--accent-emerald) 100%); color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); }
     .header-brand { display: flex; align-items: center; gap: 14px; }
     .header-logo { width: 48px; height: 48px; border-radius: 50%; background-color: white; padding: 4px; box-shadow: var(--shadow-sm); object-fit: contain; }
@@ -97,11 +95,8 @@
     .btn-primary:hover { background-color: #1D4ED8; }
     .btn-emerald { background-color: var(--accent-emerald); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
     .btn-emerald:hover { background-color: #059669; }
-    .btn-danger { background-color: var(--danger-red); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; }
     .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; }
     .btn-secondary { background: #E2E8F0; color: var(--text-dark); border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
-
-    .demo-info-box { background-color: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 12px; font-size: 12px; color: #1E40AF; line-height: 1.5; }
 
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
     .card { background: white; border-radius: var(--card-radius); padding: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); margin-bottom: 20px; }
@@ -153,7 +148,6 @@
     .chart-box { background: white; border-radius: var(--card-radius); padding: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); height: 320px; position: relative; }
 
     .img-avatar-sm { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color); }
-
     .d-none { display: none !important; }
   </style>
 </head>
@@ -161,12 +155,6 @@
 
   <!-- Toast Notification Container -->
   <div id="toast-container"></div>
-
-  <!-- Demo / Non-HTTPS Banner -->
-  <div id="demo-banner" class="demo-banner d-none">
-    <i class="fa-solid fa-triangle-exclamation"></i>
-    Aplikasi Demo — Data tersimpan secara lokal di browser perangkat Anda.
-  </div>
 
   <!-- Header -->
   <header>
@@ -201,7 +189,7 @@
       <form id="form-guru-login" class="auth-form" onsubmit="window.handleGuruLogin(event)">
         <div class="form-group">
           <label for="guru-nip"><i class="fa-solid fa-id-card"></i> NIP / NIPGTT Guru</label>
-          <input type="text" id="guru-nip" class="form-control" placeholder="Masukkan NIP / NIPGTT Guru" maxlength="18" required>
+          <input type="text" id="guru-nip" class="form-control" placeholder="Masukkan NIP / NIPGTT (18 / 12 digit)" required>
         </div>
         <div class="form-group">
           <label for="guru-pass"><i class="fa-solid fa-lock"></i> Kata Sandi</label>
@@ -213,14 +201,6 @@
           </div>
         </div>
         <button type="submit" class="btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Masuk Guru</button>
-
-        <div id="guru-demo-info" class="demo-info-box">
-          <strong><i class="fa-solid fa-circle-info"></i> Contoh NIP / NIPGTT Guru Resmi:</strong><br>
-          • <code>196907271995031003</code> (Syafruddin, S.Pd., M.Si.)<br>
-          • <code>197106252010012004</code> (Nurjannah, S.Pd.)<br>
-          • <code>198905110001</code> (Nawir, S.Pd., Gr.)<br>
-          <small>Sandi Bawaan Semua Guru: <code>123456</code></small>
-        </div>
       </form>
 
       <!-- Form Login Admin -->
@@ -239,11 +219,6 @@
           </div>
         </div>
         <button type="submit" class="btn-emerald"><i class="fa-solid fa-shield-halved"></i> Masuk Admin</button>
-
-        <div class="demo-info-box">
-          <strong><i class="fa-solid fa-circle-info"></i> Akun Admin Demo:</strong><br>
-          Username: <code>admin</code> | Sandi: <code>admin123</code>
-        </div>
       </form>
     </div>
 
@@ -721,7 +696,7 @@
         </div>
 
         <div style="border-top: 1px solid var(--border-color); margin-top: 16px; padding-top: 16px; display: flex; gap: 12px; justify-content: flex-end;">
-          <button class="btn-secondary btn-sm" onclick="window.resetSampleDataModal()"><i class="fa-solid fa-rotate-left"></i> Muat Data Contoh Resmi</button>
+          <button class="btn-secondary btn-sm" onclick="window.resetSampleDataModal()"><i class="fa-solid fa-rotate-left"></i> Muat Ulang Data Guru Resmi</button>
           <button class="btn-primary btn-sm" style="background-color: var(--danger-red);" onclick="window.clearAllAbsensiModal()"><i class="fa-solid fa-dumpster"></i> Hapus Semua Presensi</button>
         </div>
       </div>
@@ -749,22 +724,22 @@
       Kepala Sekolah: <span id="footer-kepsek-nama">Syafruddin, S.Pd., M.Si.</span><br>
       NIP. <span id="footer-kepsek-nip">196907271995031003</span>
     </div>
-    <div>&copy; 2025 SMPN 4 Tinggimoncong — Data disimpan lokal di perangkat Anda.</div>
+    <div>&copy; 2025 SMPN 4 Tinggimoncong — Sistem Informasi Presensi Guru Resmi.</div>
   </footer>
 
-  <!-- SCRIPT LOGIKA APLIKASI -->
+  <!-- SCRIPT LOGIKA APLIKASI RELEASE -->
   <script>
     /* ==========================================================================
-       KONFIGURASI UTAMA APLIKASI
+       KONFIGURASI UTAMA APLIKASI (RELEASE)
        ========================================================================== */
     const DEFAULT_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%231E3A8A'/><path d='M50 15 L80 35 L80 75 L50 90 L20 75 L20 35 Z' fill='%2310B981'/><text x='50' y='58' font-size='32' text-anchor='middle' fill='white' font-weight='bold'>4</text></svg>";
 
-    const APP_CONFIG_KEY = 'smpn4_app_config';
-    const GURU_LIST_KEY = 'smpn4_guru_list';
-    const ABSENSI_KEY = 'smpn4_absensi_records';
-    const SESSION_KEY = 'smpn4_session_token';
-    const GEO_CACHE_KEY = 'smpn4_geo_cache';
-    const LOG_KEY = 'smpn4_activity_logs';
+    const APP_CONFIG_KEY = 'smpn4_app_config_rel';
+    const GURU_LIST_KEY = 'smpn4_guru_list_rel';
+    const ABSENSI_KEY = 'smpn4_absensi_records_rel';
+    const SESSION_KEY = 'smpn4_session_token_rel';
+    const GEO_CACHE_KEY = 'smpn4_geo_cache_rel';
+    const LOG_KEY = 'smpn4_activity_logs_rel';
 
     const INITIAL_CONFIG = {
       schoolName: "SMPN 4 TINGGIMONCONG",
@@ -779,23 +754,23 @@
       kepsekNama: "Syafruddin, S.Pd., M.Si.",
       kepsekNip: "196907271995031003",
       adminUsername: "admin",
-      adminSalt: "smpn4salt2025",
+      adminSalt: "smpn4saltsecure2025",
       adminPassHash: null,
       modeVerifikasi: "selfie",
       faceThreshold: 0.55
     };
 
-    // Daftar Resmi 9 Guru SMPN 4 Tinggimoncong Sesuai Permintaan
-    const INITIAL_GURU_LIST = [
-      { nip: "196907271995031003", nama: "Syafruddin, S.Pd., M.Si.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "197106252010012004", nama: "Nurjannah, S.Pd.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "198905110001", nama: "Nawir, S.Pd., Gr.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "200011120002", nama: "St. Ulil Asmi, S.Pd., Gr.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "198710020003", nama: "Satriani, S.Pd., Gr.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "199906070004", nama: "Nurmiati, S.Pd., Gr.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "200002080005", nama: "Ibnu Nandar Almudatsir, S.Pd.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "200007110006", nama: "Nur Indah Sari, S.Pd.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null },
-      { nip: "200901010007", nama: "Satriani, A.Ma.", photoUrl: "", isDefaultPass: true, isFaceRegistered: false, faceDescriptor: null }
+    // Daftar Resmi 9 Guru SMPN 4 Tinggimoncong
+    const OFFICIAL_GURU_LIST = [
+      { nip: "196907271995031003", nama: "Syafruddin, S.Pd., M.Si.", photoUrl: "", isFaceRegistered: false, faceDescriptor: null },
+      { nip: "197106252010012004", nama: "Nurjannah, S.Pd.", photoUrl: "", isFaceRegistered: false, faceDescriptor: null },
+      { nip: "198905110001", nama: "Nawir, S.Pd., Gr.", photoUrl: "", isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200011120002", nama: "St. Ulil Asmi, S.Pd., Gr.", photoUrl: "", isFaceRegistered: false, faceDescriptor: null },
+      { nip: "198710020003", nama: "Satriani, S.Pd., Gr.", photoUrl: "", isFaceRegistered: false, faceDescriptor: null },
+      { nip: "199906070004", nama: "Nurmiati, S.Pd., Gr.", photoUrl: "", isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200002080005", nama: "Ibnu Nandar Almudatsir, S.Pd.", photoUrl: "", isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200007110006", nama: "Nur Indah Sari, S.Pd.", photoUrl: "", isFaceRegistered: false, faceDescriptor: null },
+      { nip: "200901010007", nama: "Satriani, A.Ma.", photoUrl: "", isFaceRegistered: false, faceDescriptor: null }
     ];
 
     /* ==========================================================================
@@ -848,9 +823,9 @@
         .replace(/'/g, "&#039;");
     }
 
-    async function hashText(text, salt = "smpn4salt2025") {
+    async function hashText(text, salt = "smpn4saltsecure2025") {
       const encoder = new TextEncoder();
-      const data = encoder.encode(text + (salt || "smpn4salt2025"));
+      const data = encoder.encode(text + (salt || "smpn4saltsecure2025"));
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
@@ -871,7 +846,7 @@
         localStorage.setItem(key, JSON.stringify(value));
         return true;
       } catch (err) {
-        showToast("Penyimpanan penuh, hapus data lama.", "error");
+        showToast("Penyimpanan perangkat penuh.", "error");
         return false;
       }
     }
@@ -911,7 +886,7 @@
       const logs = safeStorageGet(LOG_KEY) || [];
       const newLog = {
         waktu: `${tanggalLokal()} ${jamSekarang()}`,
-        actor: currentSession ? currentSession.nama : 'Sistem/Anonim',
+        actor: currentSession ? currentSession.nama : 'Sistem',
         action,
         detail
       };
@@ -920,7 +895,39 @@
       safeStorageSet(LOG_KEY, logs);
     }
 
-    /* FITUR TOGGLE PERLIHATKAN/SEMBUNYIKAN KATA SANDI */
+    /* MODAL KUSTOM PENGGANTI ALERT/CONFIRM */
+    window.openModal = function(title, htmlContent, onConfirmCallback = null) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-body').innerHTML = htmlContent;
+      pendingModalCallback = onConfirmCallback;
+
+      const confirmBtn = document.getElementById('modal-btn-confirm');
+      const cancelBtn = document.getElementById('modal-btn-cancel');
+
+      if (!onConfirmCallback) {
+        confirmBtn.style.display = 'none';
+        cancelBtn.textContent = 'Tutup';
+      } else {
+        confirmBtn.style.display = 'inline-flex';
+        cancelBtn.textContent = 'Batal';
+      }
+
+      document.getElementById('custom-modal').classList.add('active');
+    };
+
+    window.closeModal = function() {
+      document.getElementById('custom-modal').classList.remove('active');
+      pendingModalCallback = null;
+      stopCameraStream();
+    };
+
+    window.executeModalAction = function() {
+      if (typeof pendingModalCallback === 'function') {
+        pendingModalCallback();
+      }
+      window.closeModal();
+    };
+
     window.togglePasswordVisibility = function(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
@@ -941,11 +948,7 @@
        INITIALIZATION & SEEDING DATA
        ========================================================================== */
     async function initApp() {
-      if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-        document.getElementById('demo-banner').classList.remove('d-none');
-      }
-
-      const defaultAdminPassHash = await hashText("admin123", "smpn4salt2025");
+      const defaultAdminPassHash = await hashText("admin123", "smpn4saltsecure2025");
       let appConfig = safeStorageGet(APP_CONFIG_KEY);
       
       if (!appConfig) {
@@ -962,13 +965,12 @@
       const defaultHash = await hashText("123456");
 
       if (!guruList || guruList.length === 0) {
-        guruList = INITIAL_GURU_LIST.map(g => ({
+        guruList = OFFICIAL_GURU_LIST.map(g => ({
           ...g,
           passHash: defaultHash
         }));
         safeStorageSet(GURU_LIST_KEY, guruList);
       } else {
-        // Pastikan setiap guru memiliki passHash valid
         let updated = false;
         guruList = guruList.map(g => {
           if (!g.passHash) {
@@ -1050,7 +1052,7 @@
 
     window.handleGuruLogin = async function(e) {
       e.preventDefault();
-      const rawNip = document.getElementById('guru-nip').value;
+      const rawNip = document.getElementById('guru-nip').value.trim();
       const cleanNip = rawNip.replace(/\D/g, '');
       const pass = document.getElementById('guru-pass').value;
 
@@ -1073,7 +1075,7 @@
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
         localStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
         
-        addActivityLog("Login Guru", `Guru ${targetGuru.nama} (NIP: ${targetGuru.nip}) berhasil masuk`);
+        addActivityLog("Login Guru", `Guru ${targetGuru.nama} berhasil masuk`);
         showToast(`Selamat datang, ${targetGuru.nama}!`, "success");
         renderLoggedInUI();
       } else {
@@ -1087,7 +1089,7 @@
       const pass = document.getElementById('admin-pass').value;
 
       const cfg = safeStorageGet(APP_CONFIG_KEY) || INITIAL_CONFIG;
-      const salt = cfg.adminSalt || "smpn4salt2025";
+      const salt = cfg.adminSalt || "smpn4saltsecure2025";
       
       const inputHash = await hashText(pass, salt);
       const defaultHash = await hashText("admin123", salt);
@@ -1112,7 +1114,7 @@
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
         localStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
         
-        addActivityLog("Login Admin", "Administrator berhasil masuk ke dashboard");
+        addActivityLog("Login Admin", "Administrator berhasil masuk ke sistem");
         showToast("Login Admin Berhasil!", "success");
         renderLoggedInUI();
       } else {
@@ -1354,7 +1356,7 @@
 
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, {
           signal: controller.signal,
-          headers: { 'User-Agent': 'SMPN4Tinggimoncong-AbsensiApp/4.0' }
+          headers: { 'User-Agent': 'SMPN4Tinggimoncong-AbsensiApp/Release' }
         });
         clearTimeout(timeoutId);
 
@@ -1366,7 +1368,7 @@
           document.getElementById('gps-address').textContent = displayAddr;
         }
       } catch (e) {
-        document.getElementById('gps-address').textContent = "Lokasi terdeteksi (Gagal memuat alamat lengkap)";
+        document.getElementById('gps-address').textContent = "Lokasi terdeteksi (Alamat otomatis)";
       }
     }
 
@@ -1479,7 +1481,7 @@
         showToast("Model biometrik berhasil dimuat!", "success");
         return true;
       } catch (err) {
-        showToast("Gagal memuat model biometrik. Memakai mode Selfie dasar.", "warning");
+        showToast("Gagal memuat model biometrik. Memakai mode Selfie.", "warning");
         return false;
       }
     }
@@ -1581,7 +1583,7 @@
             })
             .catch(err => {
               if (statusEl) statusEl.textContent = "Izin Kamera Ditolak / Tidak Tersedia";
-              showToast("Gagal mengakses kamera. Periksa izin lokasi/HTTPS.", "error");
+              showToast("Gagal mengakses kamera perangkat.", "error");
             });
         }
       }, 200);
@@ -1647,9 +1649,9 @@
           <h4 style="color:var(--primary-blue);"><i class="fa-solid fa-shield-halved"></i> Form Persetujuan Privasi Biometrik</h4>
           <p>Sesuai regulasi perlindungan data pribadi, pendaftaran biometrik memerlukan persetujuan eksplisit Anda:</p>
           <ul style="margin-left: 20px; line-height: 1.5;">
-            <li>Sistem akan mengekstrak 128 titik data koordinat vektor matematika dari wajah Anda.</li>
+            <li>Sistem mengekstrak 128 titik data koordinat vektor matematika wajah.</li>
             <li>Foto mentah wajah tidak disimpan dalam server database.</li>
-            <li>Anda berhak menghapus data biometrik wajah Anda kapan saja melalui tab Profil.</li>
+            <li>Anda berhak menghapus data biometrik wajah kapan saja melalui tab Profil.</li>
           </ul>
           <label style="display:flex; align-items:center; gap:8px; font-weight:600; margin-top:6px; cursor:pointer;">
             <input type="checkbox" id="consent-check" required> Saya memahami dan menyetujui pendaftaran biometrik.
@@ -1746,6 +1748,17 @@
       });
     };
 
+    window.deleteMyData = function() {
+      window.openModal("Hapus Data Presensi Saya", "Apakah Anda yakin ingin menghapus riwayat presensi lokal Anda dari perangkat ini?", () => {
+        const records = safeStorageGet(ABSENSI_KEY) || [];
+        const filtered = records.filter(r => r.nip !== currentSession.nip);
+        safeStorageSet(ABSENSI_KEY, filtered);
+        addActivityLog("Privasi", `Guru ${currentSession.nama} menghapus riwayat presensi miliknya`);
+        showToast("Riwayat presensi Anda telah dihapus.", "success");
+        if (currentSession.role === 'guru') switchGuruTab('riwayat');
+      });
+    };
+
     function renderGuruProfil() {
       document.getElementById('prof-nama').textContent = currentSession.nama;
       document.getElementById('prof-nip').textContent = currentSession.nip;
@@ -1781,7 +1794,7 @@
       const records = safeStorageGet(ABSENSI_KEY) || [];
 
       let todayRecord = records.find(r => r.nip === currentSession.nip && r.tanggal === todayStr);
-      if (todayRecord && (todayRecord.jamMasuk || ['Izin', 'Sakit', 'Cuti', 'Menunggu'].includes(todayRecord.status))) {
+      if (todayRecord && (todayRecord.jamMasuk || ['Izin', 'Sakit', 'Cuti', 'Menunggu'].some(s => todayRecord.status.includes(s)))) {
         showToast("Anda sudah mencatatkan presensi/izin hari ini!", "error");
         return;
       }
@@ -1852,7 +1865,7 @@
           } else if (rec.status.startsWith('Terlambat')) {
             badgeClass = 'badge-warning';
             statTerlambat++;
-          } else if (['Izin', 'Sakit', 'Cuti'].includes(rec.status)) {
+          } else if (['Izin', 'Sakit', 'Cuti'].some(s => rec.status.includes(s))) {
             badgeClass = 'badge-info';
             statIzin++;
           } else if (rec.status.startsWith('[Menunggu]')) {
@@ -2032,8 +2045,8 @@
       const htmlForm = `
         <form id="form-crud-guru" style="display:flex; flex-direction:column; gap:12px;">
           <div class="form-group">
-            <label>NIP / NIPGTT Guru</label>
-            <input type="text" id="crud-nip" class="form-control" maxlength="18" placeholder="Contoh: 196907271995031003 atau 198905110001" required>
+            <label>NIP / NIPGTT Guru (12 / 18 digit)</label>
+            <input type="text" id="crud-nip" class="form-control" maxlength="18" placeholder="Contoh: 196907271995031003" required>
           </div>
           <div class="form-group">
             <label>Nama Lengkap (dengan Gelar)</label>
@@ -2073,7 +2086,6 @@
           nama,
           photoUrl,
           passHash: defaultHash,
-          isDefaultPass: true,
           isFaceRegistered: false,
           faceDescriptor: null
         });
@@ -2093,7 +2105,7 @@
       const htmlForm = `
         <form style="display:flex; flex-direction:column; gap:12px;">
           <div class="form-group">
-            <label>NIP / NIPGTT (Tidak dapat diubah)</label>
+            <label>NIP / NIPGTT (Terkunci)</label>
             <input type="text" class="form-control" value="${guru.nip}" disabled>
           </div>
           <div class="form-group">
@@ -2130,7 +2142,7 @@
 
       window.openModal(
         "Konfirmasi Hapus Guru",
-        `Apakah Anda yakin ingin menghapus data guru ${guru ? guru.nama : nip}? Seluruh data profil dan akses login akan dihapus.`,
+        `Apakah Anda yakin ingin menghapus data guru ${guru ? guru.nama : nip}?`,
         () => {
           const filtered = guruList.filter(g => g.nip !== nip);
           safeStorageSet(GURU_LIST_KEY, filtered);
@@ -2168,7 +2180,6 @@
         const guru = guruList.find(g => g.nip === nip);
         if (guru) {
           guru.passHash = await hashText(newPass);
-          guru.isDefaultPass = false;
           safeStorageSet(GURU_LIST_KEY, guruList);
           addActivityLog("Ganti Sandi Guru", `Mengubah kata sandi untuk guru ${guru.nama}`);
           showToast(`Sandi guru ${guru.nama} berhasil diperbarui!`, "success");
@@ -2370,7 +2381,7 @@
 
     window.exportRekapPDF = function() {
       if (!window.jspdf || !window.jspdf.jsPDF) {
-        showToast("Library jsPDF belum siap. Mohon periksa koneksi CDN.", "error");
+        showToast("Library jsPDF belum siap.", "error");
         return;
       }
 
@@ -2525,7 +2536,7 @@
         if (rec) {
           let badgeClass = 'badge-success';
           if (rec.status.includes('Terlambat') || rec.status.includes('Menunggu')) badgeClass = 'badge-warning';
-          if (['Izin', 'Sakit', 'Cuti'].includes(rec.status)) badgeClass = 'badge-info';
+          if (['Izin', 'Sakit', 'Cuti'].some(s => rec.status.includes(s))) badgeClass = 'badge-info';
 
           const selfieBtn = rec.fotoSelfie ? `<button class="btn-secondary btn-sm" onclick="window.viewSelfieModal('${rec.fotoSelfie}', '${rec.nama}')"><i class="fa-solid fa-image"></i></button>` : '-';
 
@@ -2586,7 +2597,7 @@
 
       if (newAdminUser) cfg.adminUsername = newAdminUser;
       if (newAdminPass) {
-        cfg.adminPassHash = await hashText(newAdminPass, cfg.adminSalt || "smpn4salt2025");
+        cfg.adminPassHash = await hashText(newAdminPass, cfg.adminSalt || "smpn4saltsecure2025");
       }
 
       safeStorageSet(APP_CONFIG_KEY, cfg);
@@ -2607,13 +2618,13 @@
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `Backup_Absensi_SMPN4Tinggimoncong_${tanggalLokal()}.json`);
+      downloadAnchor.setAttribute("download", `Backup_SMPN4Tinggimoncong_${tanggalLokal()}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
 
-      addActivityLog("Backup Data", "Mengunduh file backup database JSON");
-      showToast("File backup JSON berhasil diunduh!", "success");
+      addActivityLog("Backup", "Mengunduh file backup database JSON");
+      showToast("Backup database berhasil diunduh!", "success");
     };
 
     window.handleRestoreJSON = function(e) {
@@ -2621,104 +2632,51 @@
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = function(evt) {
         try {
-          const parsed = JSON.parse(event.target.result);
-          if (parsed.config && parsed.guruList && parsed.absensi) {
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed.config && parsed.guruList) {
             safeStorageSet(APP_CONFIG_KEY, parsed.config);
             safeStorageSet(GURU_LIST_KEY, parsed.guruList);
-            safeStorageSet(ABSENSI_KEY, parsed.absensi);
+            if (parsed.absensi) safeStorageSet(ABSENSI_KEY, parsed.absensi);
             if (parsed.logs) safeStorageSet(LOG_KEY, parsed.logs);
 
-            addActivityLog("Restore Data", "Memulihkan data sistem dari file backup JSON");
-            showToast("Restore database berhasil! Halaman dimuat ulang.", "success");
-            setTimeout(() => window.location.reload(), 1500);
+            addActivityLog("Restore", "Memulihkan database sistem dari file JSON");
+            showToast("Database berhasil dipulihkan! Memuat ulang...", "success");
+            setTimeout(() => window.location.reload(), 1200);
           } else {
-            showToast("Struktur file JSON backup tidak valid!", "error");
+            showToast("Format file backup tidak valid.", "error");
           }
         } catch (err) {
-          showToast("Gagal membaca file JSON!", "error");
+          showToast("Gagal membaca file JSON.", "error");
         }
       };
       reader.readAsText(file);
     };
 
     window.resetSampleDataModal = function() {
-      window.openModal("Muat Ulang Data Resmi Guru", "Aksi ini akan mereset daftar guru ke data resmi 9 Guru SMPN 4 Tinggimoncong.", async () => {
+      window.openModal("Reset Data Guru", "Apakah Anda ingin memuat ulang 9 data resmi guru SMPN 4 Tinggimoncong?", async () => {
         const defaultHash = await hashText("123456");
-        const freshGuru = INITIAL_GURU_LIST.map(g => ({ ...g, passHash: defaultHash }));
-        
-        const defaultAdminPassHash = await hashText("admin123", "smpn4salt2025");
-        const freshConfig = { ...INITIAL_CONFIG, adminPassHash: defaultAdminPassHash };
-
-        safeStorageSet(GURU_LIST_KEY, freshGuru);
-        safeStorageSet(APP_CONFIG_KEY, freshConfig);
-        addActivityLog("Reset Data", "Mereset daftar guru ke data resmi SMPN 4 Tinggimoncong");
-        showToast("Data resmi guru berhasil dimuat ulang!", "success");
-        setTimeout(() => window.location.reload(), 1200);
+        const freshList = OFFICIAL_GURU_LIST.map(g => ({ ...g, passHash: defaultHash }));
+        safeStorageSet(GURU_LIST_KEY, freshList);
+        addActivityLog("Reset Guru", "Memuat ulang 9 daftar guru resmi");
+        showToast("Daftar 9 guru resmi berhasil dimuat ulang!", "success");
+        renderAdminGuruTable();
       });
     };
 
     window.clearAllAbsensiModal = function() {
-      window.openModal("Hapus Semua Presensi", "PERINGATAN: Seluruh riwayat absensi guru akan dihapus permanen dari perangkat ini!", () => {
+      window.openModal("Hapus Semua Presensi", "PERINGATAN: Seluruh riwayat presensi harian akan dihapus permanen. Lanjutkan?", () => {
         safeStorageSet(ABSENSI_KEY, []);
-        addActivityLog("Hapus Data", "Menghapus seluruh riwayat presensi guru");
-        showToast("Seluruh data presensi telah dibersihkan.", "success");
-        renderAdminDashboard();
+        addActivityLog("Hapus Presensi", "Administrator menghapus seluruh riwayat presensi");
+        showToast("Semua riwayat presensi telah dibersihkan.", "success");
       });
     };
 
-    window.deleteMyData = function() {
-      window.openModal(
-        "Hapus Data Presensi Saya",
-        "Apakah Anda yakin ingin menghapus seluruh riwayat presensi lokal Anda dari perangkat ini?",
-        () => {
-          const records = safeStorageGet(ABSENSI_KEY) || [];
-          const filtered = records.filter(r => r.nip !== currentSession.nip);
-          safeStorageSet(ABSENSI_KEY, filtered);
-          addActivityLog("Right to Forgotten", `Guru ${currentSession.nama} menghapus data presensi pribadinya`);
-          showToast("Seluruh data presensi Anda telah dihapus.", "success");
-          window.switchGuruTab('riwayat');
-        }
-      );
+    // Jalankan inisialisasi saat window dimuat
+    window.onload = function() {
+      initApp();
     };
-
-    /* ==========================================================================
-       MODAL KUSTOM
-       ========================================================================== */
-    window.openModal = function(title, textOrHtml, onConfirm) {
-      document.getElementById('modal-title').textContent = title;
-      const bodyEl = document.getElementById('modal-body');
-      if (typeof textOrHtml === 'string' && textOrHtml.trim().startsWith('<')) {
-        bodyEl.innerHTML = textOrHtml;
-      } else {
-        bodyEl.textContent = textOrHtml;
-      }
-      pendingModalCallback = onConfirm;
-      document.getElementById('custom-modal').classList.add('active');
-    };
-
-    window.closeModal = function() {
-      stopCameraStream();
-      document.getElementById('custom-modal').classList.remove('active');
-      pendingModalCallback = null;
-    };
-
-    window.executeModalAction = function() {
-      if (pendingModalCallback) pendingModalCallback();
-      window.closeModal();
-    };
-
-    document.getElementById('custom-modal').addEventListener('click', (e) => {
-      if (e.target.id === 'custom-modal') window.closeModal();
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') window.closeModal();
-    });
-
-    // Inisialisasi awal aplikasi
-    document.addEventListener('DOMContentLoaded', initApp);
   </script>
 </body>
 </html>
