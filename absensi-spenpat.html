@@ -710,6 +710,9 @@
 
   <!-- SCRIPT UTAMA & FIRESTORE REAL-TIME CLOUD SYNC -->
   <script>
+    /* ==========================================================================
+       STREAMING_CHUNK:Initializing core application state & cloud sync engine...
+       ========================================================================== */
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'smpn4-tinggimoncong-absensi';
     let firebaseConfig = {};
     try {
@@ -754,7 +757,6 @@
       { nip: "200901010007", nama: "Satriani, A.Ma.", photoUrl: "", isFaceRegistered: false, faceDescriptor: null }
     ];
 
-    // Real-time Cloud Synchronized State
     let cloudState = {
       config: { ...INITIAL_CONFIG },
       gurus: [],
@@ -860,6 +862,9 @@
       }
     };
 
+    /* ==========================================================================
+       STREAMING_CHUNK:Setting up Firebase real-time listeners and offline fallbacks...
+       ========================================================================== */
     window.addEventListener('firebase-loaded', async () => {
       await initializeCloudSync();
     });
@@ -945,12 +950,13 @@
           }
         }, (err) => console.warn(err));
 
-        // 3. Absensi Records Real-time Sync (Ensures admin and teachers always see live unified data)
+        // 3. Absensi Records Real-time Sync (Unified public store for all teachers & admin)
         const absensiCol = collection(db, 'artifacts', appId, 'public', 'data', 'absensi_records');
         onSnapshot(absensiCol, (snapshot) => {
           const records = [];
           snapshot.forEach(d => records.push({ id: d.id, ...d.data() }));
           cloudState.absensi = records;
+          localStorage.setItem('smpn4_absensi_records_rel', JSON.stringify(records));
 
           if (currentSession) {
             if (currentSession.role === 'admin' && !document.getElementById('view-admin-dashboard').classList.contains('d-none')) {
@@ -981,14 +987,18 @@
     }
 
     function bootLocalFallback() {
+      const localAbsensi = localStorage.getItem('smpn4_absensi_records_rel');
       cloudState.config = { ...INITIAL_CONFIG };
       cloudState.gurus = OFFICIAL_GURU_LIST.map(g => ({ ...g, passHash: "mockhash" }));
-      cloudState.absensi = [];
+      cloudState.absensi = localAbsensi ? JSON.parse(localAbsensi) : [];
       cloudState.logs = [];
       applyConfigToUI(cloudState.config);
       checkSession();
     }
 
+    /* ==========================================================================
+       STREAMING_CHUNK:Implementing synchronized cloud save handlers...
+       ========================================================================== */
     async function cloudSaveConfig(cfg) {
       cloudState.config = cfg;
       if (db && auth?.currentUser) {
@@ -1018,26 +1028,24 @@
     }
 
     async function cloudSaveAbsensiRecord(record) {
+      // Update in-memory state immediately
+      const idx = cloudState.absensi.findIndex(r => r.nip === record.nip && r.tanggal === record.tanggal);
+      if (idx !== -1) {
+        cloudState.absensi[idx] = { ...cloudState.absensi[idx], ...record };
+      } else {
+        cloudState.absensi.push(record);
+      }
+      localStorage.setItem('smpn4_absensi_records_rel', JSON.stringify(cloudState.absensi));
+
+      // Sync to Firestore public collection with deterministic document ID (nip_tanggal) for reliable multi-user synchronization
       if (db && auth?.currentUser) {
         try {
-          const { collection, getDocs, doc, setDoc, addDoc } = window.firebaseModules;
-          const absensiCol = collection(db, 'artifacts', appId, 'public', 'data', 'absensi_records');
-          const snapshot = await getDocs(absensiCol);
-          let docId = null;
-          snapshot.forEach(d => {
-            const data = d.data();
-            if (data.nip === record.nip && data.tanggal === record.tanggal) {
-              docId = d.id;
-            }
-          });
-
-          if (docId) {
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'absensi_records', docId), record, { merge: true });
-          } else {
-            await addDoc(absensiCol, record);
-          }
+          const { doc, setDoc } = window.firebaseModules;
+          const recordId = `${record.nip}_${record.tanggal}`;
+          const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'absensi_records', recordId);
+          await setDoc(docRef, record, { merge: true });
         } catch (e) {
-          console.error("Error saving absensi:", e);
+          console.error("Error saving absensi to cloud:", e);
         }
       }
     }
@@ -1057,6 +1065,9 @@
       }
     }
 
+    /* ==========================================================================
+       STREAMING_CHUNK:Configuring UI bindings and authentication workflows...
+       ========================================================================== */
     function applyConfigToUI(cfg) {
       const logo = cfg.logoDataUrl || DEFAULT_LOGO;
       document.getElementById('header-logo-img').src = logo;
@@ -1193,6 +1204,9 @@
       if (notify) showToast("Anda telah keluar.", "warning");
     };
 
+    /* ==========================================================================
+       STREAMING_CHUNK:Setting up geolocation, Leaflet maps, and camera modules...
+       ========================================================================== */
     function cleanupResources() {
       stopCameraStream();
       if (watchGpsId) {
@@ -1311,6 +1325,9 @@
       }
     };
 
+    /* ==========================================================================
+       STREAMING_CHUNK:Configuring map coordinates and tracking attendance...
+       ========================================================================== */
     function initGuruMapAndGPS() {
       const cfg = cloudState.config;
 
@@ -1511,6 +1528,9 @@
       );
     };
 
+    /* ==========================================================================
+       STREAMING_CHUNK:Implementing check-in and check-out logic with camera support...
+       ========================================================================== */
     window.startAbsenWithCamera = function(jenis) {
       const cfg = cloudState.config;
       if (!currentGpsCoords) {
@@ -1656,6 +1676,9 @@
       }
     };
 
+    /* ==========================================================================
+       STREAMING_CHUNK:Configuring leave requests and admin approval systems...
+       ========================================================================== */
     window.handlePengajuanIzin = async function(e) {
       e.preventDefault();
       const tipe = document.getElementById('tipe-izin').value;
@@ -1880,6 +1903,9 @@
       });
     };
 
+    /* ==========================================================================
+       STREAMING_CHUNK:Configuring teacher management, rekap reports, and settings...
+       ========================================================================== */
     function renderAdminGuruTable() {
       const tbody = document.getElementById('table-admin-guru-body');
       tbody.innerHTML = '';
