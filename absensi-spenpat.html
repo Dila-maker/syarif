@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Absensi Guru SMPN 4 Tinggimoncong - Versi Release Resmi</title>
+  <title>Absensi Guru SMPN 4 Tinggimoncong - Versi Release Resmi & Cloud Sync</title>
   
   <!-- Google Fonts: Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -560,7 +560,7 @@
     <div id="view-admin-logs" class="d-none">
       <div class="card">
         <div class="card-title">
-          <span><i class="fa-solid fa-list-ol"></i> Log Aktivitas Sistem (Online Sync)</span>
+          <span><i class="fa-solid fa-list-ol"></i> Log Aktivitas Sistem (Online Real-time Sync)</span>
           <button class="btn-secondary btn-sm" onclick="window.clearActivityLogs()"><i class="fa-solid fa-trash-can"></i> Bersihkan Log</button>
         </div>
         <div class="table-responsive">
@@ -607,7 +607,7 @@
           </div>
 
           <div class="form-group">
-            <label><i class="fa-solid fa-image"></i> Logo Sekolah (Header & PDF Kop)</label>
+            <label><i class="fa-solid fa-image"></i> Logo Sekolah (Header & PDF Kop — Real-time Cloud Sync)</label>
             <div style="display: flex; align-items: center; gap: 14px;">
               <img id="cfg-logo-preview" style="width: 50px; height: 50px; border-radius: 50%; object-fit: contain; border: 1px solid var(--border-color);" src="" alt="Preview Logo">
               <input type="file" id="cfg-logo-file" accept="image/*" class="form-control" style="font-size: 12px;" onchange="window.handleLogoUpload(event)">
@@ -708,7 +708,7 @@
     <div>&copy; 2025 SMPN 4 Tinggimoncong — Sistem Informasi Presensi Guru Resmi Online Sync.</div>
   </footer>
 
-  <!-- SCRIPT UTAMA & FIRESTORE CLOUD SYNC -->
+  <!-- SCRIPT UTAMA & FIRESTORE REAL-TIME CLOUD SYNC -->
   <script>
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'smpn4-tinggimoncong-absensi';
     let firebaseConfig = {};
@@ -721,7 +721,6 @@
     let userId = null;
 
     const DEFAULT_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%231E3A8A'/><path d='M50 15 L80 35 L80 75 L50 90 L20 75 L20 35 Z' fill='%2310B981'/><text x='50' y='58' font-size='32' text-anchor='middle' fill='white' font-weight='bold'>4</text></svg>";
-
     const SESSION_KEY = 'smpn4_session_token_rel';
 
     const INITIAL_CONFIG = {
@@ -755,7 +754,7 @@
       { nip: "200901010007", nama: "Satriani, A.Ma.", photoUrl: "", isFaceRegistered: false, faceDescriptor: null }
     ];
 
-    // In-memory synchronized state
+    // Real-time Cloud Synchronized State
     let cloudState = {
       config: { ...INITIAL_CONFIG },
       gurus: [],
@@ -865,12 +864,11 @@
       await initializeCloudSync();
     });
 
-    // Fallback if event already fired
     setTimeout(() => {
       if (!db && window.firebaseModules) {
         initializeCloudSync();
       }
-    }, 500);
+    }, 400);
 
     async function initializeCloudSync() {
       try {
@@ -897,7 +895,7 @@
         if (!auth.currentUser) return;
         userId = auth.currentUser.uid;
 
-        // 1. Config Sync
+        // 1. Config Real-time Sync
         const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_config');
         const configSnap = await getDoc(configRef);
         const defaultAdminPassHash = await hashText("admin123", "smpn4saltsecure2025");
@@ -919,9 +917,9 @@
             cloudState.config = docSnap.data();
             applyConfigToUI(cloudState.config);
           }
-        });
+        }, (err) => console.warn(err));
 
-        // 2. Gurus Sync
+        // 2. Gurus Real-time Sync
         const gurusCol = collection(db, 'artifacts', appId, 'public', 'data', 'guru_list');
         const gurusSnap = await getDocs(gurusCol);
         const defaultHash = await hashText("123456");
@@ -938,19 +936,22 @@
           const list = [];
           snapshot.forEach(d => list.push(d.data()));
           cloudState.gurus = list;
-          if (currentSession && currentSession.role === 'admin' && !document.getElementById('view-admin-guru').classList.contains('d-none')) {
-            renderAdminGuruTable();
+          if (currentSession) {
+            if (currentSession.role === 'admin' && !document.getElementById('view-admin-guru').classList.contains('d-none')) {
+              renderAdminGuruTable();
+            } else if (currentSession.role === 'admin' && !document.getElementById('view-admin-dashboard').classList.contains('d-none')) {
+              renderAdminDashboard();
+            }
           }
-        });
+        }, (err) => console.warn(err));
 
-        // 3. Absensi Records Sync (Real-time online sync for admin & teachers)
+        // 3. Absensi Records Real-time Sync (Ensures admin and teachers always see live unified data)
         const absensiCol = collection(db, 'artifacts', appId, 'public', 'data', 'absensi_records');
         onSnapshot(absensiCol, (snapshot) => {
           const records = [];
           snapshot.forEach(d => records.push({ id: d.id, ...d.data() }));
           cloudState.absensi = records;
 
-          // Refresh active views if visible
           if (currentSession) {
             if (currentSession.role === 'admin' && !document.getElementById('view-admin-dashboard').classList.contains('d-none')) {
               renderAdminDashboard();
@@ -958,9 +959,9 @@
               renderGuruRiwayat();
             }
           }
-        });
+        }, (err) => console.warn(err));
 
-        // 4. Logs Sync
+        // 4. Activity Logs Real-time Sync
         const logsCol = collection(db, 'artifacts', appId, 'public', 'data', 'activity_logs');
         onSnapshot(logsCol, (snapshot) => {
           const logs = [];
@@ -969,10 +970,10 @@
           if (currentSession && currentSession.role === 'admin' && !document.getElementById('view-admin-logs').classList.contains('d-none')) {
             renderAdminLogsTable();
           }
-        });
+        }, (err) => console.warn(err));
 
       } catch (err) {
-        console.warn("Cloud sync initialized with local fallback:", err);
+        console.warn("Cloud sync fallback:", err);
         bootLocalFallback();
       }
 
@@ -1019,9 +1020,8 @@
     async function cloudSaveAbsensiRecord(record) {
       if (db && auth?.currentUser) {
         try {
-          const { collection, addDoc, query, getDocs, doc, setDoc } = window.firebaseModules;
+          const { collection, getDocs, doc, setDoc, addDoc } = window.firebaseModules;
           const absensiCol = collection(db, 'artifacts', appId, 'public', 'data', 'absensi_records');
-          // Check if record for this nip & tanggal already exists
           const snapshot = await getDocs(absensiCol);
           let docId = null;
           snapshot.forEach(d => {
@@ -1314,7 +1314,6 @@
     function initGuruMapAndGPS() {
       const cfg = cloudState.config;
 
-      // Default GPS lock to ensure attendance button is never locked
       if (!currentGpsCoords) {
         currentGpsCoords = { lat: cfg.lat, lng: cfg.lng, distance: 0, accuracy: 5 };
         document.getElementById('gps-coords').textContent = `${cfg.lat.toFixed(6)}, ${cfg.lng.toFixed(6)}`;
@@ -1391,6 +1390,32 @@
         const newPos = [lat, lng];
         guruUserMarker.setLatLng(newPos);
         guruMapInstance.panTo(newPos);
+      }
+
+      const nowTime = Date.now();
+      if (nowTime - lastGeocodeTime > 1500) {
+        lastGeocodeTime = nowTime;
+        fetchNominatimAddress(lat, lng);
+      }
+    }
+
+    async function fetchNominatimAddress(lat, lng) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, {
+          signal: controller.signal,
+          headers: { 'User-Agent': 'SMPN4Tinggimoncong-AbsensiApp/Release' }
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          const displayAddr = data.display_name ? data.display_name.split(',').slice(0, 3).join(',') : 'Lokasi Terdeteksi';
+          document.getElementById('gps-address').textContent = displayAddr;
+        }
+      } catch (e) {
+        document.getElementById('gps-address').textContent = "Lokasi terdeteksi (GPS Aktif)";
       }
     }
 
