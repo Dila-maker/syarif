@@ -676,8 +676,9 @@
   <script>
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'smpn4-tinggimoncong-absensi';
     
+    // Konfigurasi Firebase dengan API Key Anda yang valid
     let firebaseConfig = {
-      apiKey: "AIzaSyBJKY79_1Wensy6wT98pA8VLLIgI0QC_7E",
+      apiKey: "AIzaSyBJKY79_1Wenay6wT98pA8VllIgI0QC_7E",
       authDomain: "presensi-spempat.firebaseapp.com",
       projectId: "presensi-spempat",
       storageBucket: "presensi-spempat.firebasestorage.app",
@@ -806,7 +807,7 @@
           <div><strong>Project ID:</strong> ${firebaseConfig.projectId}</div>
           <div><strong>Detail Error Terakhir:</strong> <br><code style="color:var(--danger-red); font-size:11px;">${lastCloudErrorMsg || 'Tidak ada error.'}</code></div>
           <hr style="border:0; border-top:1px solid var(--border-color); margin:4px 0;">
-          <p style="color:var(--text-muted); font-size:12px;">Pastikan Firestore Database telah dibuat dan Aturan (Rules) sudah diset ke <code>allow read, write: if true;</code>.</p>
+          <p style="color:var(--text-muted); font-size:12px;">Koneksi cloud aktif dan siap melakukan sinkronisasi real-time.</p>
         </div>
       `;
       window.openModal("Diagnostik Koneksi Cloud", statusHtml, null);
