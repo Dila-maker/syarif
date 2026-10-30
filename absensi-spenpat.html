@@ -175,9 +175,12 @@
         <p id="app-agency-name">Dinas Pendidikan Kabupaten Gowa</p>
       </div>
     </div>
-    <div id="user-info-section" class="user-info-bar d-none">
-      <span id="user-display-badge" class="user-badge"><i class="fa-solid fa-user"></i> <span id="user-display-name">User</span></span>
-      <button class="btn-logout" onclick="window.appLogout()"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span id="cloud-status-badge" class="badge badge-warning" style="font-size: 11px;" title="Status Koneksi Database Cloud">⏳ Menghubungkan...</span>
+      <div id="user-info-section" class="user-info-bar d-none">
+        <span id="user-display-badge" class="user-badge"><i class="fa-solid fa-user"></i> <span id="user-display-name">User</span></span>
+        <button class="btn-logout" onclick="window.appLogout()"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+      </div>
     </div>
   </header>
 
@@ -845,7 +848,7 @@
     async function initializeCloudSync() {
       try {
         if (!window.firebaseModules || Object.keys(firebaseConfig).length === 0) {
-          bootLocalFallback();
+          bootLocalFallback("Konfigurasi Firebase Kosong");
           return;
         }
 
@@ -864,8 +867,15 @@
           await signInAnonymously(auth);
         }
 
-        if (!auth.currentUser) return;
+        if (!auth.currentUser) throw new Error("Autentikasi Firebase gagal.");
         userId = auth.currentUser.uid;
+
+        // Update status badge connected
+        const badge = document.getElementById('cloud-status-badge');
+        if (badge) {
+          badge.className = 'badge badge-success';
+          badge.innerHTML = '<i class="fa-solid fa-cloud"></i> Terhubung Cloud';
+        }
 
         const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_config');
         const configSnap = await getDoc(configRef);
@@ -942,13 +952,21 @@
         }, (err) => console.warn(err));
 
       } catch (err) {
-        bootLocalFallback();
+        console.warn("Cloud sync error:", err);
+        const badge = document.getElementById('cloud-status-badge');
+        if (badge) {
+          badge.className = 'badge badge-danger';
+          badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Gagal Cloud (Mode Lokal)';
+        }
+        showToast("Gagal terhubung ke Cloud: " + (err.message || "Cek Authentication & Firestore"), "error");
+        bootLocalFallback(err.message);
       }
 
       checkSession();
     }
 
-    function bootLocalFallback() {
+    function bootLocalFallback(reason = "") {
+      console.warn("Falling back to local storage. Reason:", reason);
       const localAbsensi = localStorage.getItem('smpn4_absensi_records_rel');
       cloudState.config = { ...INITIAL_CONFIG };
       cloudState.gurus = OFFICIAL_GURU_LIST.map(g => ({ ...g, passHash: "mockhash" }));
