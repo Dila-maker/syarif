@@ -176,7 +176,7 @@
       </div>
     </div>
     <div style="display: flex; align-items: center; gap: 10px;">
-      <span id="cloud-status-badge" class="badge badge-warning" style="font-size: 11px;" title="Status Koneksi Database Cloud">⏳ Menghubungkan...</span>
+      <span id="cloud-status-badge" class="badge badge-warning" style="font-size: 11px; cursor: pointer;" onclick="window.showCloudStatusPopup()" title="Klik untuk cek detail koneksi">⏳ Menghubungkan...</span>
       <div id="user-info-section" class="user-info-bar d-none">
         <span id="user-display-badge" class="user-badge"><i class="fa-solid fa-user"></i> <span id="user-display-name">User</span></span>
         <button class="btn-logout" onclick="window.appLogout()"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
@@ -686,18 +686,10 @@
       measurementId: "G-YH1RNQZD6X"
     };
 
-    try {
-      if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-        const parsed = JSON.parse(__firebase_config);
-        if (parsed && parsed.apiKey) {
-          firebaseConfig = parsed;
-        }
-      }
-    } catch (e) {}
-
     let db = null;
     let auth = null;
     let userId = null;
+    let lastCloudErrorMsg = "";
 
     const DEFAULT_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%231E3A8A'/><path d='M50 15 L80 35 L80 75 L50 90 L20 75 L20 35 Z' fill='%2310B981'/><text x='50' y='58' font-size='32' text-anchor='middle' fill='white' font-weight='bold'>4</text></svg>";
     const SESSION_KEY = 'smpn4_session_token_rel';
@@ -807,6 +799,19 @@
       }, 3200);
     }
 
+    window.showCloudStatusPopup = function() {
+      const statusHtml = `
+        <div style="font-size: 13px; display:flex; flex-direction:column; gap:8px;">
+          <div><strong>Status Koneksi:</strong> ${db ? '<span style="color:var(--accent-emerald)">Terhubung ke Cloud Firestore</span>' : '<span style="color:var(--danger-red)">Offline (Mode Lokal)</span>'}</div>
+          <div><strong>Project ID:</strong> ${firebaseConfig.projectId}</div>
+          <div><strong>Detail Error Terakhir:</strong> <br><code style="color:var(--danger-red); font-size:11px;">${lastCloudErrorMsg || 'Tidak ada error.'}</code></div>
+          <hr style="border:0; border-top:1px solid var(--border-color); margin:4px 0;">
+          <p style="color:var(--text-muted); font-size:12px;">Pastikan Firestore Database telah dibuat dan Aturan (Rules) sudah diset ke <code>allow read, write: if true;</code>.</p>
+        </div>
+      `;
+      window.openModal("Diagnostik Koneksi Cloud", statusHtml, null);
+    };
+
     function calculateHaversine(lat1, lon1, lat2, lon2) {
       const R = 6371000;
       const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -848,29 +853,19 @@
     async function initializeCloudSync() {
       try {
         if (!window.firebaseModules || Object.keys(firebaseConfig).length === 0) {
-          bootLocalFallback("Konfigurasi Firebase Kosong");
-          return;
+          throw new Error("Modul Firebase / Konfigurasi Kosong");
         }
 
-        const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, getFirestore, collection, doc, getDoc, setDoc, onSnapshot, getDocs } = window.firebaseModules;
+        const { initializeApp, getAuth, signInAnonymously, getFirestore, collection, doc, getDoc, setDoc, onSnapshot, getDocs } = window.firebaseModules;
         const app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
 
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          try {
-            await signInWithCustomToken(auth, __initial_auth_token);
-          } catch (e) {
-            await signInAnonymously(auth);
-          }
-        } else {
-          await signInAnonymously(auth);
-        }
+        await signInAnonymously(auth);
 
-        if (!auth.currentUser) throw new Error("Autentikasi Firebase gagal.");
+        if (!auth.currentUser) throw new Error("Autentikasi Anonim Gagal.");
         userId = auth.currentUser.uid;
 
-        // Update status badge connected
         const badge = document.getElementById('cloud-status-badge');
         if (badge) {
           badge.className = 'badge badge-success';
@@ -952,21 +947,21 @@
         }, (err) => console.warn(err));
 
       } catch (err) {
+        lastCloudErrorMsg = err.message || String(err);
         console.warn("Cloud sync error:", err);
         const badge = document.getElementById('cloud-status-badge');
         if (badge) {
           badge.className = 'badge badge-danger';
-          badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Gagal Cloud (Mode Lokal)';
+          badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Gagal Cloud (Klik Detail)';
         }
-        showToast("Gagal terhubung ke Cloud: " + (err.message || "Cek Authentication & Firestore"), "error");
-        bootLocalFallback(err.message);
+        showToast("Koneksi Cloud Gagal: " + lastCloudErrorMsg, "error");
+        bootLocalFallback(lastCloudErrorMsg);
       }
 
       checkSession();
     }
 
     function bootLocalFallback(reason = "") {
-      console.warn("Falling back to local storage. Reason:", reason);
       const localAbsensi = localStorage.getItem('smpn4_absensi_records_rel');
       cloudState.config = { ...INITIAL_CONFIG };
       cloudState.gurus = OFFICIAL_GURU_LIST.map(g => ({ ...g, passHash: "mockhash" }));
@@ -1019,7 +1014,9 @@
           const recordId = `${record.nip}_${record.tanggal}`;
           const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'absensi_records', recordId);
           await setDoc(docRef, record, { merge: true });
-        } catch (e) {}
+        } catch (e) {
+          showToast("Gagal menyimpan ke Cloud: " + e.message, "error");
+        }
       }
     }
 
