@@ -676,7 +676,6 @@
   <script>
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'smpn4-tinggimoncong-absensi';
     
-    // Konfigurasi Firebase dengan API Key Anda yang valid
     let firebaseConfig = {
       apiKey: "AIzaSyBJKY79_1Wenay6wT98pA8VllIgI0QC_7E",
       authDomain: "presensi-spempat.firebaseapp.com",
@@ -873,7 +872,8 @@
           badge.innerHTML = '<i class="fa-solid fa-cloud"></i> Terhubung Cloud';
         }
 
-        const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_config');
+        // PERBAIKAN PATH FIRESTORE: Menggunakan 4 segmen (Genap) -> artifacts / appId / config_store / app_config
+        const configRef = doc(db, 'artifacts', appId, 'config_store', 'app_config');
         const configSnap = await getDoc(configRef);
         const defaultAdminPassHash = await hashText("admin123", "smpn4saltsecure2025");
         
@@ -896,7 +896,7 @@
           }
         }, (err) => console.warn(err));
 
-        const gurusCol = collection(db, 'artifacts', appId, 'public', 'data', 'guru_list');
+        const gurusCol = collection(db, 'artifacts', appId, 'guru_store');
         const gurusSnap = await getDocs(gurusCol);
         const defaultHash = await hashText("123456");
 
@@ -921,7 +921,7 @@
           }
         }, (err) => console.warn(err));
 
-        const absensiCol = collection(db, 'artifacts', appId, 'public', 'data', 'absensi_records');
+        const absensiCol = collection(db, 'artifacts', appId, 'absensi_store');
         onSnapshot(absensiCol, (snapshot) => {
           const records = [];
           snapshot.forEach(d => records.push({ id: d.id, ...d.data() }));
@@ -937,7 +937,7 @@
           }
         }, (err) => console.warn(err));
 
-        const logsCol = collection(db, 'artifacts', appId, 'public', 'data', 'activity_logs');
+        const logsCol = collection(db, 'artifacts', appId, 'logs_store');
         onSnapshot(logsCol, (snapshot) => {
           const logs = [];
           snapshot.forEach(d => logs.push(d.data()));
@@ -977,7 +977,7 @@
       if (db && auth?.currentUser) {
         try {
           const { doc, setDoc } = window.firebaseModules;
-          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'app_config'), cfg);
+          await setDoc(doc(db, 'artifacts', appId, 'config_store', 'app_config'), cfg);
         } catch (e) {}
       }
     }
@@ -986,7 +986,7 @@
       if (db && auth?.currentUser) {
         try {
           const { doc, setDoc } = window.firebaseModules;
-          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'guru_list', String(guru.nip)), guru);
+          await setDoc(doc(db, 'artifacts', appId, 'guru_store', String(guru.nip)), guru);
         } catch (e) {}
       }
     }
@@ -995,7 +995,7 @@
       if (db && auth?.currentUser) {
         try {
           const { doc, deleteDoc } = window.firebaseModules;
-          await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'guru_list', String(nip)));
+          await deleteDoc(doc(db, 'artifacts', appId, 'guru_store', String(nip)));
         } catch (e) {}
       }
     }
@@ -1013,7 +1013,7 @@
         try {
           const { doc, setDoc } = window.firebaseModules;
           const recordId = `${record.nip}_${record.tanggal}`;
-          const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'absensi_records', recordId);
+          const docRef = doc(db, 'artifacts', appId, 'absensi_store', recordId);
           await setDoc(docRef, record, { merge: true });
         } catch (e) {
           showToast("Gagal menyimpan ke Cloud: " + e.message, "error");
@@ -1031,7 +1031,7 @@
       if (db && auth?.currentUser) {
         try {
           const { collection, addDoc } = window.firebaseModules;
-          await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'activity_logs'), newLog);
+          await addDoc(collection(db, 'artifacts', appId, 'logs_store'), newLog);
         } catch (e) {}
       }
     }
